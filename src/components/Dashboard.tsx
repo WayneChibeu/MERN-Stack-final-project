@@ -1,128 +1,286 @@
 import React from 'react';
-import { TrendingUp, Users, Target, Globe } from 'lucide-react';
-import { sdgsData } from '../data/sdgs';
-import SDGCard from './SDGCard';
+import { BookOpen, Users, Award, TrendingUp, Play, Clock, Star, Globe } from 'lucide-react';
+import { sdg4Data, educationCategories } from '../data/sdg4';
+import { useAuth } from '../context/AuthContext';
 
 interface DashboardProps {
   setCurrentView: (view: string) => void;
-  setSelectedSDG: (sdg: number) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ setCurrentView, setSelectedSDG }) => {
-  const totalProgress = Math.round(sdgsData.reduce((sum, sdg) => sum + sdg.progress, 0) / sdgsData.length);
-  const criticalGoals = sdgsData.filter(sdg => sdg.progress < 50).length;
-  const onTrackGoals = sdgsData.filter(sdg => sdg.progress >= 70).length;
+const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
+  const { user } = useAuth();
 
-  const handleSDGClick = (sdgId: number) => {
-    setSelectedSDG(sdgId);
-    setCurrentView('sdg-detail');
-  };
+  const stats = [
+    {
+      title: 'Active Courses',
+      value: '2,847',
+      change: '+12%',
+      icon: BookOpen,
+      color: 'bg-blue-500'
+    },
+    {
+      title: 'Total Learners',
+      value: '45,231',
+      change: '+8%',
+      icon: Users,
+      color: 'bg-green-500'
+    },
+    {
+      title: 'Certificates Issued',
+      value: '12,456',
+      change: '+15%',
+      icon: Award,
+      color: 'bg-purple-500'
+    },
+    {
+      title: 'Global Reach',
+      value: '127 Countries',
+      change: '+3',
+      icon: Globe,
+      color: 'bg-orange-500'
+    }
+  ];
+
+  const featuredCourses = [
+    {
+      id: '1',
+      title: 'Digital Literacy for Beginners',
+      instructor: 'Dr. Sarah Johnson',
+      students: 1234,
+      rating: 4.8,
+      duration: '6 weeks',
+      image: 'https://images.pexels.com/photos/4144923/pexels-photo-4144923.jpeg?auto=compress&cs=tinysrgb&w=500',
+      category: 'Digital Literacy'
+    },
+    {
+      id: '2',
+      title: 'Mathematics for Primary Education',
+      instructor: 'Prof. Michael Chen',
+      students: 892,
+      rating: 4.9,
+      duration: '8 weeks',
+      image: 'https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=500',
+      category: 'Primary Education'
+    },
+    {
+      id: '3',
+      title: 'Sustainable Development Education',
+      instructor: 'Dr. Amara Okafor',
+      students: 567,
+      rating: 4.7,
+      duration: '4 weeks',
+      image: 'https://images.pexels.com/photos/8926558/pexels-photo-8926558.jpeg?auto=compress&cs=tinysrgb&w=500',
+      category: 'Environmental Studies'
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <BookOpen className="w-10 h-10 text-white" />
+              </div>
+            </div>
             <h1 className="text-4xl md:text-6xl font-bold mb-4">
-              Global Goals for Sustainable Development
+              EduConnect
             </h1>
-            <p className="text-xl md:text-2xl mb-8 max-w-4xl mx-auto">
-              Track progress, contribute to projects, and help achieve the 17 Sustainable Development Goals by 2030
+            <p className="text-xl md:text-2xl mb-2 max-w-4xl mx-auto">
+              Empowering Quality Education for All
             </p>
-            <button
-              onClick={() => setCurrentView('projects')}
-              className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Explore Projects
-            </button>
+            <p className="text-lg mb-8 max-w-3xl mx-auto opacity-90">
+              Supporting SDG 4: Ensure inclusive and equitable quality education and promote lifelong learning opportunities for everyone
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => setCurrentView('courses')}
+                className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+              >
+                Explore Courses
+              </button>
+              {user?.role === 'teacher' && (
+                <button
+                  onClick={() => setCurrentView('create-course')}
+                  className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+                >
+                  Create Course
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Stats Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Overall Progress</p>
-                <p className="text-3xl font-bold text-gray-900">{totalProgress}%</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">On Track Goals</p>
-                <p className="text-3xl font-bold text-green-600">{onTrackGoals}</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <Target className="w-6 h-6 text-green-600" />
+          {stats.map((stat, index) => (
+            <div key={index} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                  <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                  <p className="text-sm text-green-600 font-medium">{stat.change} this month</p>
+                </div>
+                <div className={`w-12 h-12 ${stat.color} rounded-full flex items-center justify-center`}>
+                  <stat.icon className="w-6 h-6 text-white" />
+                </div>
               </div>
             </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Critical Goals</p>
-                <p className="text-3xl font-bold text-red-600">{criticalGoals}</p>
-              </div>
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <Globe className="w-6 h-6 text-red-600" />
-              </div>
+          ))}
+        </div>
+
+        {/* SDG 4 Progress */}
+        <div className="bg-white rounded-xl shadow-md p-8 mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">SDG 4: Quality Education Progress</h2>
+              <p className="text-gray-600">Global progress towards ensuring inclusive and equitable quality education</p>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold text-blue-600">{sdg4Data.progress}%</div>
+              <div className="text-sm text-gray-500">Global Progress</div>
             </div>
           </div>
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Active Projects</p>
-                <p className="text-3xl font-bold text-purple-600">1,247</p>
-              </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                <Users className="w-6 h-6 text-purple-600" />
-              </div>
+          <div className="w-full bg-gray-200 rounded-full h-4 mb-6">
+            <div
+              className="h-4 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-500"
+              style={{ width: `${sdg4Data.progress}%` }}
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <div className="text-2xl font-bold text-gray-900">{sdg4Data.globalStats.outOfSchoolChildren.toLocaleString()}</div>
+              <div className="text-sm text-gray-600">Out-of-school children</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-gray-900">{sdg4Data.globalStats.literacyRate}%</div>
+              <div className="text-sm text-gray-600">Global literacy rate</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-gray-900">{sdg4Data.globalStats.completionRatePrimary}%</div>
+              <div className="text-sm text-gray-600">Primary completion</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-gray-900">{sdg4Data.globalStats.completionRateSecondary}%</div>
+              <div className="text-sm text-gray-600">Secondary completion</div>
             </div>
           </div>
         </div>
 
-        {/* SDGs Grid */}
+        {/* Education Categories */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">The 17 Sustainable Development Goals</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {sdgsData.map((sdg) => (
-              <SDGCard 
-                key={sdg.id} 
-                sdg={sdg} 
-                onClick={() => handleSDGClick(sdg.id)}
-              />
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Education Categories</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {educationCategories.map((category) => (
+              <div
+                key={category.id}
+                className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
+                onClick={() => setCurrentView('courses')}
+              >
+                <div className="flex items-center space-x-4 mb-4">
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-white"
+                    style={{ backgroundColor: category.color }}
+                  >
+                    <BookOpen className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">{category.name}</h3>
+                    <p className="text-sm text-gray-600">{category.description}</p>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center text-sm text-gray-500">
+                  <span>{Math.floor(Math.random() * 500) + 100} courses</span>
+                  <span className="text-blue-600 hover:underline">Explore →</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Featured Courses */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900">Featured Courses</h2>
+            <button
+              onClick={() => setCurrentView('courses')}
+              className="text-blue-600 hover:text-blue-700 font-medium"
+            >
+              View All Courses →
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredCourses.map((course) => (
+              <div key={course.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                <div className="relative">
+                  <img
+                    src={course.image}
+                    alt={course.title}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                      {course.category}
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                    <Play className="w-12 h-12 text-white opacity-0 hover:opacity-100 transition-opacity" />
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{course.title}</h3>
+                  <p className="text-gray-600 text-sm mb-4">by {course.instructor}</p>
+                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-1">
+                        <Users className="w-4 h-4" />
+                        <span>{course.students.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Clock className="w-4 h-4" />
+                        <span>{course.duration}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="font-medium">{course.rating}</span>
+                    </div>
+                  </div>
+                  <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    Enroll Now
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         </div>
 
         {/* Call to Action */}
-        <div className="bg-white rounded-xl shadow-md p-8 text-center">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready to Make an Impact?</h3>
-          <p className="text-gray-600 mb-6">
-            Join thousands of changemakers working towards a sustainable future. Create a project, 
-            contribute to existing initiatives, or track your personal SDG progress.
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-md p-8 text-center text-white">
+          <h3 className="text-2xl font-bold mb-4">Join the Education Revolution</h3>
+          <p className="text-lg mb-6 opacity-90">
+            Be part of the global movement to ensure quality education for all. Whether you're a learner seeking knowledge 
+            or an educator ready to share your expertise, EduConnect is your platform for impact.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => setCurrentView('projects')}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              onClick={() => setCurrentView(user ? 'my-learning' : 'register')}
+              className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
-              Browse Projects
+              {user ? 'My Learning' : 'Start Learning'}
             </button>
-            <button
-              onClick={() => setCurrentView('register')}
-              className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
-            >
-              Get Started
-            </button>
+            {(!user || user.role === 'teacher') && (
+              <button
+                onClick={() => setCurrentView(user ? 'create-course' : 'register')}
+                className="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+              >
+                {user ? 'Create Course' : 'Become an Educator'}
+              </button>
+            )}
           </div>
         </div>
       </div>
