@@ -13,6 +13,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, setCurrentView }) => {
     email: '',
     password: '',
     name: '',
+    role: 'student',
     confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -84,6 +85,23 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, setCurrentView }) => {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
                 </div>
+              </div>
+            )}
+            
+            {type === 'register' && (
+              <div className="relative">
+                <label htmlFor="role" className="sr-only">Role</label>
+                <select
+                  id="role"
+                  name="role"
+                  required
+                  className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                >
+                  <option value="student">Student</option>
+                  <option value="teacher">Teacher</option>
+                </select>
               </div>
             )}
             

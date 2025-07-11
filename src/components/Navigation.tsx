@@ -13,9 +13,9 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setCurrentView }) 
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', protected: false },
-    { id: 'sdgs', label: 'SDGs', protected: false },
-    { id: 'projects', label: 'Projects', protected: false },
-    { id: 'my-projects', label: 'My Projects', protected: true },
+    { id: 'courses', label: 'Courses', protected: false },
+    { id: 'my-learning', label: 'My Learning', protected: true },
+    { id: 'teacher-dashboard', label: 'Teach', protected: true, roles: ['teacher', 'admin'] },
     { id: 'profile', label: 'Profile', protected: true },
   ];
 
@@ -38,6 +38,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setCurrentView }) 
             <div className="ml-10 flex items-baseline space-x-4">
               {navItems.map((item) => {
                 if (item.protected && !user) return null;
+                if (item.roles && (!user || !item.roles.includes(user.role))) return null;
                 return (
                   <button
                     key={item.id}
@@ -104,6 +105,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setCurrentView }) 
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
             {navItems.map((item) => {
               if (item.protected && !user) return null;
+              if (item.roles && (!user || !item.roles.includes(user.role))) return null;
               return (
                 <button
                   key={item.id}
