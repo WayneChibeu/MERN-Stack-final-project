@@ -52,8 +52,12 @@ function App() {
       <ToastProvider>
         <ToastListWrapper />
         <div className="min-h-screen bg-gray-50">
-          <Navigation currentView={currentView} setCurrentView={setCurrentView} />
-          {renderCurrentView()}
+          <nav role="navigation">
+            <Navigation currentView={currentView} setCurrentView={setCurrentView} />
+          </nav>
+          <main role="main">
+            {renderCurrentView()}
+          </main>
         </div>
       </ToastProvider>
     </AuthProvider>

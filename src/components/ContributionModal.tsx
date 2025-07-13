@@ -82,21 +82,28 @@ const ContributionModal: React.FC<ContributionModalProps> = ({ project, isOpen, 
   if (!isOpen || !project) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="presentation">
+      <div
+        className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="contribution-modal-title"
+        aria-describedby="contribution-modal-desc"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">Contribute to Project</h2>
+          <h2 id="contribution-modal-title" className="text-xl font-bold text-gray-900">Contribute to Project</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label="Close contribution modal"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
         {/* Project Info */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200" id="contribution-modal-desc">
           <h3 className="font-semibold text-gray-900 mb-2">{project.title}</h3>
           <p className="text-sm text-gray-600 line-clamp-2">{project.description}</p>
         </div>
