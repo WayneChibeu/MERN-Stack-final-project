@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 interface AuthFormProps {
   type: 'login' | 'register';
@@ -9,6 +10,7 @@ interface AuthFormProps {
 
 const AuthForm: React.FC<AuthFormProps> = ({ type, setCurrentView }) => {
   const { login, register } = useAuth();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -30,15 +32,21 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, setCurrentView }) => {
       if (type === 'register') {
         if (formData.password !== formData.confirmPassword) {
           setError('Passwords do not match');
+          showToast('Passwords do not match', 'error');
+          setLoading(false);
           return;
         }
         await register(formData.email, formData.password, formData.name, formData.role);
+        showToast('Registration successful! Welcome!', 'success');
       } else {
         await login(formData.email, formData.password);
+        showToast('Login successful! Welcome back!', 'success');
       }
       setCurrentView('dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const msg = err instanceof Error ? err.message : 'An error occurred';
+      setError(msg);
+      showToast(msg, 'error');
     } finally {
       setLoading(false);
     }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, Plus, X, Upload, Video, FileText, HelpCircle, Save } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { educationCategories, courseSubjects } from '../data/sdg4';
+import { useToast } from '../context/ToastContext';
 
 interface CreateCourseProps {
   setCurrentView: (view: string) => void;
@@ -37,6 +38,7 @@ interface Quiz {
 
 const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
@@ -169,10 +171,11 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
 
       console.log('Course created:', coursePayload);
       // Here you would send to your API
-      
+      showToast('Course created successfully!', 'success');
       setCurrentView('teacher-dashboard');
     } catch (error) {
       console.error('Error creating course:', error);
+      showToast('Error creating course. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Play, Clock, Users, Star, BookOpen, Award, MessageCircle, DollarSign, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 interface CourseDetailProps {
   courseId: string | null;
@@ -9,6 +10,7 @@ interface CourseDetailProps {
 
 const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView }) => {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
   const [enrolled, setEnrolled] = useState(false);
 
@@ -137,10 +139,16 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
   const handleEnroll = () => {
     if (!user) {
       setCurrentView('login');
+      showToast('Please log in to enroll in a course.', 'warning');
       return;
     }
-    setEnrolled(true);
-    // Here you would call your enrollment API
+    try {
+      setEnrolled(true);
+      // Here you would call your enrollment API
+      showToast('Enrolled in course successfully!', 'success');
+    } catch (error) {
+      showToast('Error enrolling in course. Please try again.', 'error');
+    }
   };
 
   const renderStars = (rating: number) => {

@@ -2,15 +2,20 @@ import React, { useState } from 'react';
 import { Plus, Search, Filter, MapPin, Calendar, Users, DollarSign } from 'lucide-react';
 import { sdgsData } from '../data/sdgs';
 import { Project } from '../types';
+import { useToast } from '../context/ToastContext';
+import ContributionModal from './ContributionModal';
 
 interface ProjectsListProps {
   setCurrentView: (view: string) => void;
 }
 
 const ProjectsList: React.FC<ProjectsListProps> = ({ setCurrentView }) => {
+  const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSDG, setSelectedSDG] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isContributionModalOpen, setIsContributionModalOpen] = useState(false);
 
   // Mock projects data
   const mockProjects: Project[] = [
@@ -119,6 +124,16 @@ const ProjectsList: React.FC<ProjectsListProps> = ({ setCurrentView }) => {
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const handleContribute = (project: Project) => {
+    setSelectedProject(project);
+    setIsContributionModalOpen(true);
+  };
+
+  const closeContributionModal = () => {
+    setIsContributionModalOpen(false);
+    setSelectedProject(null);
   };
 
   return (
@@ -264,7 +279,10 @@ const ProjectsList: React.FC<ProjectsListProps> = ({ setCurrentView }) => {
                     <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
                       View Details
                     </button>
-                    <button className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
+                    <button 
+                      onClick={() => handleContribute(project)}
+                      className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                    >
                       Contribute
                     </button>
                   </div>
@@ -290,6 +308,13 @@ const ProjectsList: React.FC<ProjectsListProps> = ({ setCurrentView }) => {
           </div>
         )}
       </div>
+      
+      {/* Contribution Modal */}
+      <ContributionModal
+        project={selectedProject}
+        isOpen={isContributionModalOpen}
+        onClose={closeContributionModal}
+      />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, Mail, Calendar, Award, BookOpen, Edit, Save, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 interface ProfileProps {
   setCurrentView: (view: string) => void;
@@ -8,6 +9,7 @@ interface ProfileProps {
 
 const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -20,9 +22,14 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
   });
 
   const handleSave = () => {
-    // Here you would update the user profile via API
-    console.log('Saving profile:', formData);
-    setIsEditing(false);
+    try {
+      // Here you would update the user profile via API
+      console.log('Saving profile:', formData);
+      setIsEditing(false);
+      showToast('Profile updated successfully!', 'success');
+    } catch (error) {
+      showToast('Error updating profile. Please try again.', 'error');
+    }
   };
 
   const handleCancel = () => {

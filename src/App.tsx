@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
+import ToastList from './components/Toast';
 import Navigation from './components/Navigation';
 import Dashboard from './components/Dashboard';
 import CourseCatalog from './components/CourseCatalog';
@@ -9,6 +11,7 @@ import MyLearning from './components/MyLearning';
 import TeacherDashboard from './components/TeacherDashboard';
 import AuthForm from './components/AuthForm';
 import Profile from './components/Profile';
+import CreateProject from './components/CreateProject';
 
 function App() {
   const [currentView, setCurrentView] = useState('dashboard');
@@ -34,6 +37,8 @@ function App() {
         return <AuthForm type="login" setCurrentView={setCurrentView} />;
       case 'register':
         return <AuthForm type="register" setCurrentView={setCurrentView} />;
+      case 'create-project':
+        return <CreateProject setCurrentView={setCurrentView} />;
       default:
         return <Dashboard setCurrentView={setCurrentView} />;
     }
@@ -41,12 +46,21 @@ function App() {
 
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-gray-50">
-        <Navigation currentView={currentView} setCurrentView={setCurrentView} />
-        {renderCurrentView()}
-      </div>
+      <ToastProvider>
+        <ToastListWrapper />
+        <div className="min-h-screen bg-gray-50">
+          <Navigation currentView={currentView} setCurrentView={setCurrentView} />
+          {renderCurrentView()}
+        </div>
+      </ToastProvider>
     </AuthProvider>
   );
 }
+
+// ToastList needs to be outside the main layout div for proper fixed positioning
+const ToastListWrapper = () => {
+  const { toasts, removeToast } = require('./context/ToastContext').useToast();
+  return <ToastList toasts={toasts} removeToast={removeToast} />;
+};
 
 export default App;
