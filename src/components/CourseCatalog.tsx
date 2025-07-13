@@ -167,17 +167,17 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto container-padding section">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Course Catalog</h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 leading-relaxed">
             Discover quality education courses designed to support SDG 4 and promote lifelong learning.
           </p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="card p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
@@ -247,13 +247,13 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
 
         {/* Results Summary */}
         <div className="mb-6">
-          <p className="text-gray-600">
+          <p className="text-gray-600 leading-relaxed">
             Showing {sortedCourses.length} of {mockCourses.length} courses
           </p>
         </div>
 
         {/* Courses Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid-responsive">
           {loading ? (
             Array.from({ length: 6 }).map((_, idx) => (
               <SkeletonCourseCard key={idx} />
@@ -264,7 +264,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
               return (
                 <div 
                   key={course.id} 
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
+                  className="card overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
                   onClick={() => handleCourseClick(course.id)}
                 >
                   <div className="relative">
@@ -304,7 +304,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
                     </div>
                     
                     <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{course.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">{course.description}</p>
+                    <p className="text-gray-600 text-small mb-4 line-clamp-2 leading-relaxed">{course.description}</p>
                     
                     <div className="flex items-center space-x-2 mb-4">
                       <img
@@ -315,7 +315,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
                       <span className="text-sm text-gray-700">{course.instructor}</span>
                     </div>
 
-                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                    <div className="flex items-center justify-between text-small text-gray-500 mb-4">
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-1">
                           <Users className="w-4 h-4" />
@@ -336,7 +336,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
                       <div className="flex items-center space-x-1">
                         <Star className="w-4 h-4 text-yellow-400 fill-current" />
                         <span className="font-medium text-gray-900">{course.rating}</span>
-                        <span className="text-sm text-gray-500">({course.students})</span>
+                        <span className="text-small text-gray-500">({course.students})</span>
                       </div>
                       {course.certificate && (
                         <div className="flex items-center space-x-1 text-green-600">
@@ -358,7 +358,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
               <Search className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No courses found</h3>
-            <p className="text-gray-600 mb-6">Try adjusting your search criteria or browse all courses.</p>
+            <p className="text-gray-600 mb-6 leading-relaxed">Try adjusting your search criteria or browse all courses.</p>
             <button
               onClick={() => {
                 setSearchTerm('');

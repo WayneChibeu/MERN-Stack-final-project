@@ -77,24 +77,24 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white section-lg">
+        <div className="max-w-7xl mx-auto container-padding">
           <div className="text-center">
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-8">
               <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
                 <BookOpen className="w-10 h-10 text-white" />
               </div>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
               EduConnect
             </h1>
-            <p className="text-xl md:text-2xl mb-2 max-w-4xl mx-auto">
+            <h2 className="text-xl md:text-2xl mb-4 max-w-4xl mx-auto font-medium">
               Empowering Quality Education for All
-            </p>
-            <p className="text-lg mb-8 max-w-3xl mx-auto opacity-90">
+            </h2>
+            <p className="text-lg mb-10 max-w-3xl mx-auto opacity-90 leading-relaxed">
               Supporting SDG 4: Ensure inclusive and equitable quality education and promote lifelong learning opportunities for everyone
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="btn-group justify-center">
               <button
                 onClick={() => setCurrentView('courses')}
                 className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
@@ -114,16 +114,16 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto container-padding section">
         {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid-responsive-4 mb-12">
           {stats.map((stat, index) => (
-            <div key={index} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div key={index} className="card p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                  <p className="text-small font-medium">{stat.title}</p>
                   <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-                  <p className="text-sm text-green-600 font-medium">{stat.change} this month</p>
+                  <p className="text-small text-green-600 font-medium">{stat.change} this month</p>
                 </div>
                 <div className={`w-12 h-12 ${stat.color} rounded-full flex items-center justify-center`}>
                   <stat.icon className="w-6 h-6 text-white" />
@@ -134,15 +134,15 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
         </div>
 
         {/* SDG 4 Progress */}
-        <div className="bg-white rounded-xl shadow-md p-8 mb-12">
+        <div className="card p-8 mb-12">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">SDG 4: Quality Education Progress</h2>
-              <p className="text-gray-600">Global progress towards ensuring inclusive and equitable quality education</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">SDG 4: Quality Education Progress</h2>
+              <p className="text-gray-600 leading-relaxed">Global progress towards ensuring inclusive and equitable quality education</p>
             </div>
             <div className="text-right">
               <div className="text-3xl font-bold text-blue-600">{sdg4Data.progress}%</div>
-              <div className="text-sm text-gray-500">Global Progress</div>
+              <div className="text-small text-gray-500">Global Progress</div>
             </div>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-4 mb-6">
@@ -151,22 +151,22 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
               style={{ width: `${sdg4Data.progress}%` }}
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+          <div className="grid-responsive-4 text-center">
             <div>
               <div className="text-2xl font-bold text-gray-900">{sdg4Data.globalStats.outOfSchoolChildren.toLocaleString()}</div>
-              <div className="text-sm text-gray-600">Out-of-school children</div>
+              <div className="text-small text-gray-600">Out-of-school children</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-gray-900">{sdg4Data.globalStats.literacyRate}%</div>
-              <div className="text-sm text-gray-600">Global literacy rate</div>
+              <div className="text-small text-gray-600">Global literacy rate</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-gray-900">{sdg4Data.globalStats.completionRatePrimary}%</div>
-              <div className="text-sm text-gray-600">Primary completion</div>
+              <div className="text-small text-gray-600">Primary completion</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-gray-900">{sdg4Data.globalStats.completionRateSecondary}%</div>
-              <div className="text-sm text-gray-600">Secondary completion</div>
+              <div className="text-small text-gray-600">Secondary completion</div>
             </div>
           </div>
         </div>
@@ -174,11 +174,11 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
         {/* Education Categories */}
         <div className="mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Education Categories</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid-responsive">
             {educationCategories.map((category) => (
               <div
                 key={category.id}
-                className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
+                className="card p-6 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
                 onClick={() => setCurrentView('courses')}
               >
                 <div className="flex items-center space-x-4 mb-4">
@@ -190,10 +190,10 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900">{category.name}</h3>
-                    <p className="text-sm text-gray-600">{category.description}</p>
+                    <p className="text-small text-gray-600">{category.description}</p>
                   </div>
                 </div>
-                <div className="flex justify-between items-center text-sm text-gray-500">
+                <div className="flex justify-between items-center text-small text-gray-500">
                   <span>{Math.floor(Math.random() * 500) + 100} courses</span>
                   <span className="text-blue-600 hover:underline">Explore →</span>
                 </div>
@@ -213,9 +213,9 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
               View All Courses →
             </button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid-responsive">
             {featuredCourses.map((course) => (
-              <div key={course.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <div key={course.id} className="card overflow-hidden hover:shadow-lg transition-shadow">
                 <div className="relative">
                   <img
                     src={course.image}
@@ -233,8 +233,8 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{course.title}</h3>
-                  <p className="text-gray-600 text-sm mb-4">by {course.instructor}</p>
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                  <p className="text-gray-600 text-small mb-4">by {course.instructor}</p>
+                  <div className="flex items-center justify-between text-small text-gray-500 mb-4">
                     <div className="flex items-center space-x-4">
                       <div className="flex items-center space-x-1">
                         <Users className="w-4 h-4" />
@@ -261,12 +261,12 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
 
         {/* Call to Action */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-md p-8 text-center text-white">
-          <h3 className="text-2xl font-bold mb-4">Join the Education Revolution</h3>
-          <p className="text-lg mb-6 opacity-90">
+          <h3 className="text-2xl font-bold mb-6">Join the Education Revolution</h3>
+          <p className="text-lg mb-8 opacity-90 leading-relaxed">
             Be part of the global movement to ensure quality education for all. Whether you're a learner seeking knowledge 
             or an educator ready to share your expertise, EduConnect is your platform for impact.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="btn-group justify-center">
             <button
               onClick={() => setCurrentView(user ? 'my-learning' : 'register')}
               className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
