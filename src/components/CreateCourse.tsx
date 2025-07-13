@@ -190,36 +190,36 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <button
             onClick={() => setCurrentView('teacher-dashboard')}
             className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Dashboard
+            <span className="text-sm sm:text-base">Back to Dashboard</span>
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">Create New Course</h1>
-          <p className="text-gray-600">Share your knowledge and contribute to quality education</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Create New Course</h1>
+          <p className="text-gray-600 text-sm sm:text-base">Share your knowledge and contribute to quality education</p>
         </div>
 
-        {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        {/* Progress Steps - Mobile Optimized */}
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center">
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full text-sm sm:text-base ${
                   currentStep >= step.id ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
                 }`}>
                   {step.id}
                 </div>
                 <div className="ml-3">
                   <div className="text-sm font-medium text-gray-900">{step.title}</div>
-                  <div className="text-xs text-gray-500">{step.description}</div>
+                  <div className="text-xs text-gray-500 hidden sm:block">{step.description}</div>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`w-16 h-1 mx-4 ${
+                  <div className={`hidden sm:block w-16 h-1 mx-4 ${
                     currentStep > step.id ? 'bg-blue-600' : 'bg-gray-200'
                   }`} />
                 )}
@@ -228,20 +228,20 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
           {/* Step 1: Course Info */}
           {currentStep === 1 && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-900">Course Information</h2>
+            <div className="space-y-4 sm:space-y-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Course Information</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Course Title *
                   </label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                     value={courseData.title}
                     onChange={(e) => setCourseData({...courseData, title: e.target.value})}
                     placeholder="Enter course title"
@@ -253,7 +253,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
                     Category *
                   </label>
                   <select
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                     value={courseData.category}
                     onChange={(e) => setCourseData({...courseData, category: e.target.value})}
                   >
@@ -271,7 +271,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
                     Subject *
                   </label>
                   <select
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                     value={courseData.subject}
                     onChange={(e) => setCourseData({...courseData, subject: e.target.value})}
                   >
@@ -289,7 +289,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
                     Level *
                   </label>
                   <select
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                     value={courseData.level}
                     onChange={(e) => setCourseData({...courseData, level: e.target.value})}
                   >
@@ -306,7 +306,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
                   <input
                     type="number"
                     min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                     value={courseData.price}
                     onChange={(e) => setCourseData({...courseData, price: parseFloat(e.target.value) || 0})}
                     placeholder="0 for free course"
@@ -319,7 +319,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
                   </label>
                   <input
                     type="url"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                     value={courseData.image_url}
                     onChange={(e) => setCourseData({...courseData, image_url: e.target.value})}
                     placeholder="https://example.com/image.jpg"
@@ -333,7 +333,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
                 </label>
                 <textarea
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                   value={courseData.description}
                   onChange={(e) => setCourseData({...courseData, description: e.target.value})}
                   placeholder="Describe what students will learn in this course"
@@ -344,9 +344,9 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
 
           {/* Step 2: Lessons */}
           {currentStep === 2 && (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-gray-900">Course Lessons</h2>
+            <div className="space-y-4 sm:space-y-6">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Course Lessons</h2>
                 <span className="text-sm text-gray-500">{lessons.length} lessons added</span>
               </div>
 

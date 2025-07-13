@@ -125,13 +125,13 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Profile Header */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 h-32"></div>
-          <div className="relative px-6 pb-6">
-            <div className="flex items-end space-x-6 -mt-16">
-              <div className="w-32 h-32 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6 sm:mb-8">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 h-24 sm:h-32"></div>
+          <div className="relative px-4 sm:px-6 pb-4 sm:pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-end space-y-4 sm:space-y-0 sm:space-x-6 -mt-12 sm:-mt-16">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center mx-auto sm:mx-0">
                 {user?.avatar ? (
                   <img
                     src={user.avatar}
@@ -139,20 +139,20 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                     className="w-full h-full rounded-full object-cover"
                   />
                 ) : (
-                  <User className="w-16 h-16 text-gray-400" />
+                  <User className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
                 )}
               </div>
-              <div className="flex-1 pb-4">
-                <div className="flex items-center justify-between">
+              <div className="flex-1 pb-4 text-center sm:text-left">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">{user?.name}</h1>
-                    <p className="text-gray-600 capitalize">{user?.role}</p>
-                    <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                      <div className="flex items-center space-x-1">
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{user?.name}</h1>
+                    <p className="text-gray-600 capitalize text-sm sm:text-base">{user?.role}</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mt-2 text-sm text-gray-500">
+                      <div className="flex items-center justify-center sm:justify-start space-x-1">
                         <Mail className="w-4 h-4" />
                         <span>{user?.email}</span>
                       </div>
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center justify-center sm:justify-start space-x-1">
                         <Calendar className="w-4 h-4" />
                         <span>Joined January 2024</span>
                       </div>
@@ -160,7 +160,7 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                   </div>
                   <button
                     onClick={() => setIsEditing(!isEditing)}
-                    className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex items-center justify-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
                   >
                     <Edit className="w-4 h-4" />
                     <span>Edit Profile</span>
@@ -171,25 +171,25 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
             {/* Profile Information */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Profile Information</h2>
+            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 space-y-4 sm:space-y-0">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Profile Information</h2>
                 {isEditing && (
-                  <div className="flex space-x-2">
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                     <button
                       onClick={handleSave}
-                      className="flex items-center space-x-2 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                      className="flex items-center justify-center space-x-2 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
                     >
                       <Save className="w-4 h-4" />
                       <span>Save</span>
                     </button>
                     <button
                       onClick={handleCancel}
-                      className="flex items-center space-x-2 bg-gray-600 text-white px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                      className="flex items-center justify-center space-x-2 bg-gray-600 text-white px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm"
                     >
                       <X className="w-4 h-4" />
                       <span>Cancel</span>
@@ -199,7 +199,7 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
               </div>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Full Name
@@ -207,12 +207,12 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                     {isEditing ? (
                       <input
                         type="text"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
                       />
                     ) : (
-                      <p className="text-gray-900">{formData.name}</p>
+                      <p className="text-gray-900 text-sm sm:text-base">{formData.name}</p>
                     )}
                   </div>
                   <div>
@@ -222,12 +222,12 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                     {isEditing ? (
                       <input
                         type="email"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                       />
                     ) : (
-                      <p className="text-gray-900">{formData.email}</p>
+                      <p className="text-gray-900 text-sm sm:text-base">{formData.email}</p>
                     )}
                   </div>
                 </div>
@@ -239,16 +239,16 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                   {isEditing ? (
                     <textarea
                       rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                       value={formData.bio}
                       onChange={(e) => setFormData({...formData, bio: e.target.value})}
                     />
                   ) : (
-                    <p className="text-gray-900">{formData.bio}</p>
+                    <p className="text-gray-900 text-sm sm:text-base">{formData.bio}</p>
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Location
@@ -256,12 +256,12 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                     {isEditing ? (
                       <input
                         type="text"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                         value={formData.location}
                         onChange={(e) => setFormData({...formData, location: e.target.value})}
                       />
                     ) : (
-                      <p className="text-gray-900">{formData.location}</p>
+                      <p className="text-gray-900 text-sm sm:text-base">{formData.location}</p>
                     )}
                   </div>
                   <div>
@@ -271,13 +271,13 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                     {isEditing ? (
                       <input
                         type="url"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                         value={formData.website}
                         onChange={(e) => setFormData({...formData, website: e.target.value})}
                         placeholder="https://yourwebsite.com"
                       />
                     ) : (
-                      <p className="text-gray-900">{formData.website || 'Not provided'}</p>
+                      <p className="text-gray-900 text-sm sm:text-base">{formData.website || 'Not provided'}</p>
                     )}
                   </div>
                 </div>

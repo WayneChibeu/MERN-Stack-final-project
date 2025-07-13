@@ -61,25 +61,25 @@ const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <button
             onClick={() => setCurrentView('projects')}
             className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Projects
+            <span className="text-sm sm:text-base">Back to Projects</span>
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">Create New SDG Project</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Create New SDG Project</h1>
+          <p className="text-gray-600 text-sm sm:text-base mt-2">
             Start a project that makes a real impact on the Sustainable Development Goals.
           </p>
         </div>
 
         {/* Project Form */}
-        <div className="bg-white rounded-xl shadow-md p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white rounded-xl shadow-md p-4 sm:p-8">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Project Title */}
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
@@ -90,7 +90,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
                 id="title"
                 name="title"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                 placeholder="Enter project title"
                 value={formData.title}
                 onChange={handleInputChange}
@@ -107,7 +107,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
                 name="description"
                 required
                 rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                 placeholder="Describe your project and its impact"
                 value={formData.description}
                 onChange={handleInputChange}
@@ -123,7 +123,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
                 id="sdg_id"
                 name="sdg_id"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                 value={formData.sdg_id}
                 onChange={handleInputChange}
               >
@@ -142,14 +142,14 @@ const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
                 Target Amount (USD)
               </label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
                   type="number"
                   id="target_amount"
                   name="target_amount"
                   min="0"
                   step="0.01"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                   placeholder="0.00"
                   value={formData.target_amount}
                   onChange={handleInputChange}
@@ -163,12 +163,12 @@ const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
                 Project Image URL
               </label>
               <div className="relative">
-                <Upload className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                <Upload className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
                   type="url"
                   id="image_url"
                   name="image_url"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                   placeholder="https://example.com/image.jpg"
                   value={formData.image_url}
                   onChange={handleInputChange}
@@ -177,18 +177,18 @@ const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
             </div>
 
             {/* Submit Button */}
-            <div className="flex justify-end space-x-4 pt-6">
+            <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-6">
               <button
                 type="button"
                 onClick={() => setCurrentView('projects')}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="w-full sm:w-auto px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
