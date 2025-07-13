@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AuthProvider } from './context/AuthContext';
-import { ToastProvider } from './context/ToastContext';
+import { ToastProvider, useToast } from './context/ToastContext';
 import ToastList from './components/Toast';
 import Navigation from './components/Navigation';
 import Dashboard from './components/Dashboard';
@@ -59,7 +59,7 @@ function App() {
 
 // ToastList needs to be outside the main layout div for proper fixed positioning
 const ToastListWrapper = () => {
-  const { toasts, removeToast } = require('./context/ToastContext').useToast();
+  const { toasts, removeToast } = useToast();
   return <ToastList toasts={toasts} removeToast={removeToast} />;
 };
 
