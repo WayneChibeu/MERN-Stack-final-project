@@ -117,7 +117,7 @@ EduConnect is a comprehensive MERN stack platform designed to support the United
 - **Frontend:** Deploy to Vercel or Netlify. Set the `VITE_API_URL` environment variable in your deployment dashboard to your backend API URL (e.g., `https://mern-stack-final-project.onrender.com/api`).
 - **Backend:** Deploy to Render (or similar). Ensure your backend environment variables are set in the Render dashboard.
 - **Production URLs:**
-  - **Frontend:** [https://your-frontend-url.vercel.app](https://your-frontend-url.vercel.app)
+  - **Frontend:** [https://mern-stack-final-project.vercel.app](https://mern-stack-final-project.vercel.app)
   - **Backend:** [https://mern-stack-final-project.onrender.com](https://mern-stack-final-project.onrender.com)
 
 ## Usage Guide
