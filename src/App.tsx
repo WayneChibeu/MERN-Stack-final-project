@@ -12,6 +12,7 @@ import TeacherDashboard from './components/TeacherDashboard';
 import AuthForm from './components/AuthForm';
 import Profile from './components/Profile';
 import CreateProject from './components/CreateProject';
+import ProjectsList from './components/ProjectsList';
 
 function App() {
   const [currentView, setCurrentView] = useState('dashboard');
@@ -37,6 +38,8 @@ function App() {
         return <AuthForm type="login" setCurrentView={setCurrentView} />;
       case 'register':
         return <AuthForm type="register" setCurrentView={setCurrentView} />;
+      case 'projects':
+        return <ProjectsList setCurrentView={setCurrentView} />;
       case 'create-project':
         return <CreateProject setCurrentView={setCurrentView} />;
       default:

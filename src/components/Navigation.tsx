@@ -14,6 +14,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setCurrentView }) 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', protected: false },
     { id: 'courses', label: 'Courses', protected: false },
+    { id: 'projects', label: 'Projects', protected: false },
     { id: 'my-learning', label: 'My Learning', protected: true },
     { id: 'teacher-dashboard', label: 'Teach', protected: true, roles: ['teacher', 'admin'] },
     { id: 'profile', label: 'Profile', protected: true },
