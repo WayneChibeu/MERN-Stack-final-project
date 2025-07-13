@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User, Mail, Calendar, Award, BookOpen, Edit, Save, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import Button from './ui/Button';
 
 interface ProfileProps {
   setCurrentView: (view: string) => void;
@@ -158,13 +159,13 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                       </div>
                     </div>
                   </div>
-                  <button
+                  <Button
                     onClick={() => setIsEditing(!isEditing)}
-                    className="flex items-center justify-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+                    icon={Edit}
+                    size="md"
                   >
-                    <Edit className="w-4 h-4" />
-                    <span>Edit Profile</span>
-                  </button>
+                    Edit Profile
+                  </Button>
                 </div>
               </div>
             </div>
@@ -180,20 +181,22 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900">Profile Information</h2>
                 {isEditing && (
                   <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                    <button
+                    <Button
                       onClick={handleSave}
-                      className="flex items-center justify-center space-x-2 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
+                      variant="secondary"
+                      icon={Save}
+                      size="sm"
                     >
-                      <Save className="w-4 h-4" />
-                      <span>Save</span>
-                    </button>
-                    <button
+                      Save
+                    </Button>
+                    <Button
                       onClick={handleCancel}
-                      className="flex items-center justify-center space-x-2 bg-gray-600 text-white px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                      variant="outline"
+                      icon={X}
+                      size="sm"
                     >
-                      <X className="w-4 h-4" />
-                      <span>Cancel</span>
-                    </button>
+                      Cancel
+                    </Button>
                   </div>
                 )}
               </div>

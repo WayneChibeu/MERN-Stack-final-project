@@ -3,6 +3,7 @@ import { ArrowLeft, Save, Upload, DollarSign, Target, FileText } from 'lucide-re
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { sdgsData } from '../data/sdgs';
+import Button from './ui/Button';
 
 interface CreateProjectProps {
   setCurrentView: (view: string) => void;
@@ -178,25 +179,22 @@ const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
 
             {/* Submit Button */}
             <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-6">
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => setCurrentView('projects')}
-                className="w-full sm:w-auto px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
+                fullWidth={false}
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                disabled={loading}
-                className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                loading={loading}
+                icon={Save}
+                fullWidth={false}
               >
-                {loading ? (
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
-                ) : (
-                  <Save className="w-5 h-5" />
-                )}
-                <span>{loading ? 'Creating...' : 'Create Project'}</span>
-              </button>
+                {loading ? 'Creating...' : 'Create Project'}
+              </Button>
             </div>
           </form>
         </div>
