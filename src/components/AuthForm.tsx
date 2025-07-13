@@ -32,7 +32,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, setCurrentView }) => {
           setError('Passwords do not match');
           return;
         }
-        await register(formData.email, formData.password, formData.name);
+        await register(formData.email, formData.password, formData.name, formData.role);
       } else {
         await login(formData.email, formData.password);
       }

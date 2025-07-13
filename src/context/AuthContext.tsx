@@ -19,7 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const token = localStorage.getItem('auth-token');
     if (token) {
       // Verify token with backend
-      fetch('/api/auth/verify', {
+      fetch(`${import.meta.env.VITE_API_URL}/auth/verify`, {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(res => res.json())
@@ -38,34 +38,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
 
-    const data = await response.json();
+    let data;
+    try {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        throw new Error(text);
+      }
+    } catch (err) {
+      throw new Error('Invalid server response');
+    }
     if (response.ok) {
       localStorage.setItem('auth-token', data.token);
       setUser(data.user);
     } else {
-      throw new Error(data.error);
+      throw new Error(data?.error || 'Login failed');
     }
   };
 
   const register = async (email: string, password: string, name: string) => {
-    const response = await fetch('/api/auth/register', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, name })
     });
 
-    const data = await response.json();
+    let data;
+    try {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        throw new Error(text);
+      }
+    } catch (err) {
+      throw new Error('Invalid server response');
+    }
     if (response.ok) {
       localStorage.setItem('auth-token', data.token);
       setUser(data.user);
     } else {
-      throw new Error(data.error);
+      throw new Error(data?.error || 'Registration failed');
     }
   };
 
