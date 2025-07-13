@@ -85,13 +85,13 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
                 <BookOpen className="w-10 h-10 text-white" />
               </div>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white">
               EduConnect
             </h1>
-            <h2 className="text-xl md:text-2xl mb-4 max-w-4xl mx-auto font-medium">
+            <h2 className="text-xl md:text-2xl mb-4 max-w-4xl mx-auto font-medium text-white">
               Empowering Quality Education for All
             </h2>
-            <p className="text-lg mb-10 max-w-3xl mx-auto opacity-90 leading-relaxed">
+            <p className="text-lg mb-10 max-w-3xl mx-auto opacity-90 leading-relaxed text-white/80">
               Supporting SDG 4: Ensure inclusive and equitable quality education and promote lifelong learning opportunities for everyone
             </p>
             <div className="btn-group justify-center">
@@ -261,8 +261,8 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
 
         {/* Call to Action */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-md p-8 text-center text-white">
-          <h3 className="text-2xl font-bold mb-6">Join the Education Revolution</h3>
-          <p className="text-lg mb-8 opacity-90 leading-relaxed">
+          <h3 className="text-2xl font-bold mb-6 text-white">Join the Education Revolution</h3>
+          <p className="text-lg mb-8 opacity-90 leading-relaxed text-white/80">
             Be part of the global movement to ensure quality education for all. Whether you're a learner seeking knowledge 
             or an educator ready to share your expertise, EduConnect is your platform for impact.
           </p>
