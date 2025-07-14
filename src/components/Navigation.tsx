@@ -134,41 +134,41 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setCurrentView }) 
 
             {/* Navigation Items */}
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {navItems.map((item) => {
-                if (item.protected && !user) return null;
-                if (item.roles && (!user || !item.roles.includes(user.role))) return null;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      setCurrentView(item.id);
-                      setIsMenuOpen(false);
-                    }}
+            {navItems.map((item) => {
+              if (item.protected && !user) return null;
+              if (item.roles && (!user || !item.roles.includes(user.role))) return null;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setCurrentView(item.id);
+                    setIsMenuOpen(false);
+                  }}
                     className={`block px-3 py-3 rounded-md text-base font-medium w-full text-left transition-colors ${
-                      currentView === item.id
-                        ? 'bg-blue-500 text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                );
-              })}
+                    currentView === item.id
+                      ? 'bg-blue-500 text-white'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
             </div>
 
             {/* Auth Buttons */}
             {user ? (
               <div className="px-2 pb-3">
-                <button
+              <button
                   onClick={() => {
                     logout();
                     setIsMenuOpen(false);
                   }}
                   className="flex items-center space-x-2 w-full px-3 py-3 rounded-md text-base font-medium text-red-600 hover:bg-red-50 transition-colors"
-                >
+              >
                   <LogOut className="w-5 h-5" />
                   <span>Logout</span>
-                </button>
+              </button>
               </div>
             ) : (
               <div className="px-2 pb-3 space-y-2">

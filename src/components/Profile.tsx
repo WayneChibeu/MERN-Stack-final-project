@@ -407,7 +407,7 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
               <div className="space-y-3">
                 <button
                   onClick={() => setCurrentView('my-learning')}
-                  className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <div className="flex items-center space-x-3">
                     <BookOpen className="w-5 h-5 text-blue-600" />
@@ -416,7 +416,7 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                 </button>
                 <button
                   onClick={() => setCurrentView('courses')}
-                  className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <div className="flex items-center space-x-3">
                     <BookOpen className="w-5 h-5 text-green-600" />
@@ -426,7 +426,7 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                 {user?.role === 'teacher' && (
                   <button
                     onClick={() => setCurrentView('teacher-dashboard')}
-                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
                   >
                     <div className="flex items-center space-x-3">
                       <User className="w-5 h-5 text-purple-600" />

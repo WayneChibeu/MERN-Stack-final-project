@@ -288,7 +288,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ setCurrentView, set
                           <p className="text-sm text-gray-500">{course.students} students enrolled</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium text-gray-900">${course.revenue.toLocaleString()}</p>
+                          <p className="font-medium text-gray-900" title="Total revenue from this course">${course.revenue.toLocaleString()}</p>
                           <p className="text-sm text-gray-500">Revenue</p>
                         </div>
                       </div>
@@ -343,21 +343,21 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ setCurrentView, set
                           <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
                             <div>
                               <span className="text-gray-500">Students:</span>
-                              <p className="font-medium text-gray-900">{course.students.toLocaleString()}</p>
+                              <p className="font-medium text-gray-900" title="Number of students enrolled">{course.students.toLocaleString()}</p>
                             </div>
                             <div>
                               <span className="text-gray-500">Revenue:</span>
-                              <p className="font-medium text-gray-900">
+                              <p className="font-medium text-gray-900" title="Total revenue from this course">
                                 {course.revenue === 0 ? 'Free' : `$${course.revenue.toLocaleString()}`}
                               </p>
                             </div>
                             <div>
                               <span className="text-gray-500">Rating:</span>
-                              <p className="font-medium text-gray-900">{course.rating} ⭐</p>
+                              <p className="font-medium text-gray-900" title="Average course rating">{course.rating} ⭐</p>
                             </div>
                             <div>
                               <span className="text-gray-500">Price:</span>
-                              <p className="font-medium text-gray-900">
+                              <p className="font-medium text-gray-900" title="Current price for this course">
                                 {course.price === 0 ? 'Free' : `$${course.price}`}
                               </p>
                             </div>
@@ -370,21 +370,21 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ setCurrentView, set
                             <div className="flex space-x-2">
                               <button
                                 onClick={() => handleCourseAction('view', course.id)}
-                                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 title="View Course"
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleCourseAction('edit', course.id)}
-                                className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
                                 title="Edit Course"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleCourseAction('delete', course.id)}
-                                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
                                 title="Delete Course"
                               >
                                 <Trash2 className="w-4 h-4" />

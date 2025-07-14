@@ -33,12 +33,13 @@ const ToastList: React.FC<ToastListProps> = ({ toasts, removeToast }) => (
         {typeIcons[toast.type]}
         <span className="flex-1 text-sm font-medium">{toast.message}</span>
         <button
-          className="ml-2 text-gray-400 hover:text-gray-700 focus:outline-none"
+          className="ml-2 text-gray-400 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           onClick={(e) => {
             e.stopPropagation();
             removeToast(toast.id);
           }}
           aria-label="Dismiss"
+          title="Dismiss"
         >
           <X className="w-4 h-4" />
         </button>

@@ -156,6 +156,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
                   onChange={handleInputChange}
                 />
               </div>
+              <p className="text-xs text-gray-500 mt-1">Set a fundraising goal for your project. Leave at 0 if not applicable.</p>
             </div>
 
             {/* Image URL */}
@@ -175,6 +176,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
                   onChange={handleInputChange}
                 />
               </div>
+              <p className="text-xs text-gray-500 mt-1">Paste a direct link to an image that represents your project (optional).</p>
             </div>
 
             {/* Submit Button */}

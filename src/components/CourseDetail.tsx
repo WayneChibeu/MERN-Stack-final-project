@@ -184,7 +184,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
                   className="w-full h-64 object-cover"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <button className="w-16 h-16 bg-white bg-opacity-90 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all">
+                  <button className="w-16 h-16 bg-white bg-opacity-90 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <Play className="w-8 h-8 text-blue-600 ml-1" />
                   </button>
                 </div>

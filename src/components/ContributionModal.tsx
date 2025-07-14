@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, DollarSign, Clock, Package, Send } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -19,6 +19,48 @@ const ContributionModal: React.FC<ContributionModalProps> = ({ project, isOpen, 
     amount: 0,
     description: ''
   });
+
+  const firstInputRef = useRef<HTMLInputElement | null>(null);
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
+  // Auto-focus the first input when modal opens
+  useEffect(() => {
+    if (isOpen && firstInputRef.current) {
+      firstInputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  // Focus trap
+  useEffect(() => {
+    if (!isOpen || !modalRef.current) return;
+    const focusableSelectors = [
+      'a[href]', 'button:not([disabled])', 'textarea:not([disabled])', 'input:not([type=hidden]):not([disabled])', '[tabindex]:not([tabindex="-1"])'
+    ];
+    const focusableEls = modalRef.current.querySelectorAll<HTMLElement>(focusableSelectors.join(','));
+    if (!focusableEls.length) return;
+    const firstEl = focusableEls[0];
+    const lastEl = focusableEls[focusableEls.length - 1];
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Tab') {
+        if (e.shiftKey) {
+          if (document.activeElement === firstEl) {
+            e.preventDefault();
+            lastEl.focus();
+          }
+        } else {
+          if (document.activeElement === lastEl) {
+            e.preventDefault();
+            firstEl.focus();
+          }
+        }
+      }
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    }
+    modalRef.current.addEventListener('keydown', handleKeyDown);
+    return () => modalRef.current?.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,19 +126,22 @@ const ContributionModal: React.FC<ContributionModalProps> = ({ project, isOpen, 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="presentation">
       <div
+        ref={modalRef}
         className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
         role="dialog"
         aria-modal="true"
         aria-labelledby="contribution-modal-title"
         aria-describedby="contribution-modal-desc"
+        tabIndex={-1}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 id="contribution-modal-title" className="text-xl font-bold text-gray-900">Contribute to Project</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Close contribution modal"
+            title="Close"
           >
             <X className="w-6 h-6" />
           </button>
@@ -118,6 +163,7 @@ const ContributionModal: React.FC<ContributionModalProps> = ({ project, isOpen, 
             <div className="space-y-3">
               <label className="flex items-center space-x-3 cursor-pointer">
                 <input
+                  ref={firstInputRef}
                   type="radio"
                   name="type"
                   value="monetary"
@@ -176,6 +222,7 @@ const ContributionModal: React.FC<ContributionModalProps> = ({ project, isOpen, 
                   onChange={handleInputChange}
                 />
               </div>
+              <p className="text-xs text-gray-500 mt-1">Enter the amount you wish to contribute. Minimum $0.01.</p>
             </div>
           )}
 
@@ -199,6 +246,7 @@ const ContributionModal: React.FC<ContributionModalProps> = ({ project, isOpen, 
               value={contributionData.description}
               onChange={handleInputChange}
             />
+            <p className="text-xs text-gray-500 mt-1">Describe your contribution. For time/resources, be as specific as possible.</p>
           </div>
 
           {/* Submit Button */}

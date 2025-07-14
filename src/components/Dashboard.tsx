@@ -97,14 +97,14 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
             <div className="btn-group justify-center">
               <button
                 onClick={() => setCurrentView('courses')}
-                className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+                className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Explore Courses
               </button>
               {user?.role === 'teacher' && (
                 <button
                   onClick={() => setCurrentView('create-course')}
-                  className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+                  className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-white"
                 >
                   Create Course
                 </button>
@@ -122,10 +122,10 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-small font-medium">{stat.title}</p>
-                  <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                  <p className="text-3xl font-bold text-gray-900" title={stat.title}>{stat.value}</p>
                   <p className="text-small text-green-600 font-medium">{stat.change} this month</p>
                 </div>
-                <div className={`w-12 h-12 ${stat.color} rounded-full flex items-center justify-center`}>
+                <div className={`w-12 h-12 ${stat.color} rounded-full flex items-center justify-center`} title={stat.title}>
                   <stat.icon className="w-6 h-6 text-white" />
                 </div>
               </div>
@@ -153,19 +153,19 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
           </div>
           <div className="grid-responsive-4 text-center">
             <div>
-              <div className="text-2xl font-bold text-gray-900">{sdg4Data.globalStats.outOfSchoolChildren.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-gray-900" title="Total number of out-of-school children worldwide">{sdg4Data.globalStats.outOfSchoolChildren.toLocaleString()}</div>
               <div className="text-small text-gray-600">Out-of-school children</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-gray-900">{sdg4Data.globalStats.literacyRate}%</div>
+              <div className="text-2xl font-bold text-gray-900" title="Percentage of people globally who can read and write">{sdg4Data.globalStats.literacyRate}%</div>
               <div className="text-small text-gray-600">Global literacy rate</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-gray-900">{sdg4Data.globalStats.completionRatePrimary}%</div>
+              <div className="text-2xl font-bold text-gray-900" title="Percentage of children who complete primary school">{sdg4Data.globalStats.completionRatePrimary}%</div>
               <div className="text-small text-gray-600">Primary completion</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-gray-900">{sdg4Data.globalStats.completionRateSecondary}%</div>
+              <div className="text-2xl font-bold text-gray-900" title="Percentage of children who complete secondary school">{sdg4Data.globalStats.completionRateSecondary}%</div>
               <div className="text-small text-gray-600">Secondary completion</div>
             </div>
           </div>
@@ -250,7 +250,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
                       <span className="font-medium">{course.rating}</span>
                     </div>
                   </div>
-                  <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                  <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
                     Enroll Now
                   </button>
                 </div>

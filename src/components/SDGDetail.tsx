@@ -22,7 +22,7 @@ const SDGDetail: React.FC<SDGDetailProps> = ({ sdgId, setCurrentView }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <button
             onClick={() => setCurrentView('dashboard')}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            className="flex items-center text-gray-600 hover:text-gray-900 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Dashboard
@@ -121,13 +121,13 @@ const SDGDetail: React.FC<SDGDetailProps> = ({ sdgId, setCurrentView }) => {
               <div className="space-y-3">
                 <button
                   onClick={() => setCurrentView('projects')}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   Browse Related Projects
                 </button>
                 <button
                   onClick={() => setCurrentView('create-project')}
-                  className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                  className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   Create New Project
                 </button>

@@ -260,94 +260,94 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
             ))
           ) : (
             sortedCourses.map(course => {
-              const categoryData = getCategoryData(course.category);
-              return (
-                <div 
-                  key={course.id} 
+            const categoryData = getCategoryData(course.category);
+            return (
+              <div 
+                key={course.id} 
                   className="card overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
-                  onClick={() => handleCourseClick(course.id)}
-                >
-                  <div className="relative">
-                    <img
-                      src={course.image}
-                      alt={course.title}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="absolute top-4 left-4">
-                      <div
-                        className="px-3 py-1 rounded-full text-white text-sm font-medium"
-                        style={{ backgroundColor: categoryData?.color || '#6B7280' }}
-                      >
-                        {categoryData?.name || 'Course'}
-                      </div>
-                    </div>
-                    <div className="absolute top-4 right-4">
-                      <div className="bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
-                        {course.price === 0 ? 'Free' : `$${course.price}`}
-                      </div>
-                    </div>
-                    <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-                      <Play className="w-12 h-12 text-white opacity-0 hover:opacity-100 transition-opacity" />
+                onClick={() => handleCourseClick(course.id)}
+              >
+                <div className="relative">
+                  <img
+                    src={course.image}
+                    alt={course.title}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <div
+                      className="px-3 py-1 rounded-full text-white text-sm font-medium"
+                      style={{ backgroundColor: categoryData?.color || '#6B7280' }}
+                    >
+                      {categoryData?.name || 'Course'}
                     </div>
                   </div>
-                  
-                  <div className="p-6">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        course.level === 'beginner' ? 'bg-green-100 text-green-800' :
-                        course.level === 'intermediate' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {course.level.charAt(0).toUpperCase() + course.level.slice(1)}
-                      </span>
-                      <span className="text-xs text-gray-500">{course.subject}</span>
+                  <div className="absolute top-4 right-4">
+                    <div className="bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
+                      {course.price === 0 ? 'Free' : `$${course.price}`}
                     </div>
-                    
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{course.title}</h3>
-                    <p className="text-gray-600 text-small mb-4 line-clamp-2 leading-relaxed">{course.description}</p>
-                    
-                    <div className="flex items-center space-x-2 mb-4">
-                      <img
-                        src={course.instructor_avatar}
-                        alt={course.instructor}
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                      <span className="text-sm text-gray-700">{course.instructor}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-small text-gray-500 mb-4">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-1">
-                          <Users className="w-4 h-4" />
-                          <span>{course.students.toLocaleString()}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Clock className="w-4 h-4" />
-                          <span>{course.duration}h</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <BookOpen className="w-4 h-4" />
-                          <span>{course.lessons} lessons</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="font-medium text-gray-900">{course.rating}</span>
-                        <span className="text-small text-gray-500">({course.students})</span>
-                      </div>
-                      {course.certificate && (
-                        <div className="flex items-center space-x-1 text-green-600">
-                          <BookOpen className="w-4 h-4" />
-                          <span className="text-xs">Certificate</span>
-                        </div>
-                      )}
-                    </div>
+                  </div>
+                  <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                    <Play className="w-12 h-12 text-white opacity-0 hover:opacity-100 transition-opacity" />
                   </div>
                 </div>
-              );
+                
+                <div className="p-6">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      course.level === 'beginner' ? 'bg-green-100 text-green-800' :
+                      course.level === 'intermediate' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {course.level.charAt(0).toUpperCase() + course.level.slice(1)}
+                    </span>
+                    <span className="text-xs text-gray-500">{course.subject}</span>
+                  </div>
+                  
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{course.title}</h3>
+                    <p className="text-gray-600 text-small mb-4 line-clamp-2 leading-relaxed">{course.description}</p>
+                  
+                  <div className="flex items-center space-x-2 mb-4">
+                    <img
+                      src={course.instructor_avatar}
+                      alt={course.instructor}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <span className="text-sm text-gray-700">{course.instructor}</span>
+                  </div>
+
+                    <div className="flex items-center justify-between text-small text-gray-500 mb-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-1">
+                        <Users className="w-4 h-4" />
+                        <span>{course.students.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Clock className="w-4 h-4" />
+                        <span>{course.duration}h</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <BookOpen className="w-4 h-4" />
+                        <span>{course.lessons} lessons</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="font-medium text-gray-900">{course.rating}</span>
+                        <span className="text-small text-gray-500">({course.students})</span>
+                    </div>
+                    {course.certificate && (
+                      <div className="flex items-center space-x-1 text-green-600">
+                        <BookOpen className="w-4 h-4" />
+                        <span className="text-xs">Certificate</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
             })
           )}
         </div>

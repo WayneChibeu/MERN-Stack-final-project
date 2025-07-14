@@ -311,6 +311,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
                     onChange={(e) => setCourseData({...courseData, price: parseFloat(e.target.value) || 0})}
                     placeholder="0 for free course"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Set to 0 for a free course.</p>
                 </div>
 
                 <div>
@@ -324,6 +325,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
                     onChange={(e) => setCourseData({...courseData, image_url: e.target.value})}
                     placeholder="https://example.com/image.jpg"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Paste a direct link to an image for your course (optional).</p>
                 </div>
               </div>
 
