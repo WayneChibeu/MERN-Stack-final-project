@@ -84,7 +84,7 @@ app.post('/api/users/avatar', authenticateToken, upload.single('avatar'), async 
 // Auth routes
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name, role } = req.body;
 
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -99,7 +99,8 @@ app.post('/api/auth/register', async (req, res) => {
     const user = new User({
       email,
       password: hashedPassword,
-      name
+      name,
+      role // <-- save the role
     });
 
     await user.save();
@@ -113,7 +114,8 @@ app.post('/api/auth/register', async (req, res) => {
         id: user._id, 
         email: user.email, 
         name: user.name,
-        avatar: user.avatar
+        avatar: user.avatar,
+        role: user.role
       } 
     });
   } catch (error) {
@@ -146,7 +148,8 @@ app.post('/api/auth/login', async (req, res) => {
         id: user._id, 
         email: user.email, 
         name: user.name,
-        avatar: user.avatar
+        avatar: user.avatar,
+        role: user.role
       } 
     });
   } catch (error) {
