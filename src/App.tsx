@@ -28,6 +28,15 @@ const RequireTeacher = ({ children }: { children: React.ReactNode }) => {
   return user && user.role === 'teacher' ? <>{children}</> : <Navigate to="/dashboard" replace />;
 };
 
+const DashboardRedirect = () => {
+  const { user } = useAuth();
+  if (!user) return null;
+  if (user.role === 'teacher') {
+    return <Navigate to="/teacher/dashboard" replace />;
+  }
+  return <Navigate to="/dashboard/student" replace />;
+};
+
 function App() {
   return (
     <AuthProvider>
@@ -41,7 +50,8 @@ function App() {
             <main role="main">
               <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+                <Route path="/dashboard" element={<RequireAuth><DashboardRedirect /></RequireAuth>} />
+                <Route path="/dashboard/student" element={<RequireAuth><Dashboard /></RequireAuth>} />
                 <Route path="/courses" element={<RequireAuth><CourseCatalog /></RequireAuth>} />
                 <Route path="/course/:id" element={<RequireAuth><CourseDetail /></RequireAuth>} />
                 <Route path="/my-learning" element={<RequireAuth><MyLearning /></RequireAuth>} />
