@@ -9,10 +9,35 @@ import Project from './models/Project.js';
 import Contribution from './models/Contribution.js';
 import multer from 'multer';
 import path from 'path';
+import Notification from './models/Notification.js';
+import http from 'http';
+import { Server as SocketIOServer } from 'socket.io';
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+const io = new SocketIOServer(server, {
+  cors: { origin: '*' }
+});
+
+// Store userId <-> socketId mapping
+const userSockets = new Map();
+
+io.on('connection', (socket) => {
+  // Listen for user identification
+  socket.on('identify', (userId) => {
+    userSockets.set(userId, socket.id);
+  });
+
+  socket.on('disconnect', () => {
+    // Remove user from map on disconnect
+    for (const [userId, sockId] of userSockets.entries()) {
+      if (sockId === socket.id) userSockets.delete(userId);
+    }
+  });
+});
+
 const PORT = process.env.PORT || 3001;
 
 // Connect to MongoDB
@@ -428,6 +453,50 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+// Get notifications for logged-in user
+app.get('/api/notifications', authenticateToken, async (req, res) => {
+  try {
+    const notifications = await Notification.find({ userId: req.user.userId }).sort({ createdAt: -1 });
+    res.json(notifications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Create a notification
+app.post('/api/notifications', authenticateToken, async (req, res) => {
+  try {
+    const { message, userId } = req.body;
+    if (!message || !userId) return res.status(400).json({ error: 'Message and userId required' });
+    const notification = new Notification({ userId, message });
+    await notification.save();
+    // Emit real-time notification
+    const socketId = userSockets.get(userId);
+    if (socketId) {
+      io.to(socketId).emit('notification', notification);
+    }
+    res.status(201).json(notification);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Mark a notification as read
+app.patch('/api/notifications/:id/read', authenticateToken, async (req, res) => {
+  try {
+    const notification = await Notification.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.userId },
+      { read: true },
+      { new: true }
+    );
+    if (!notification) return res.status(404).json({ error: 'Notification not found' });
+    res.json(notification);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Start the server
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

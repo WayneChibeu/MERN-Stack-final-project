@@ -14,6 +14,7 @@ import AuthForm from './components/AuthForm';
 import Profile from './components/Profile';
 import CreateProject from './components/CreateProject';
 import ProjectsList from './components/ProjectsList';
+import { SocketProvider } from './context/SocketContext';
 
 // Route protection wrappers
 const RequireAuth = ({ children }: { children: React.ReactNode }) => {
@@ -40,37 +41,39 @@ const DashboardRedirect = () => {
 function App() {
   return (
     <AuthProvider>
-      <ToastProvider>
-        <ToastListWrapper />
-        <Router>
-          <div className="min-h-screen bg-gray-50">
-            <nav role="navigation">
-              <Navigation />
-            </nav>
-            <main role="main">
-              <Routes>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/dashboard" element={<RequireAuth><DashboardRedirect /></RequireAuth>} />
-                <Route path="/dashboard/student" element={<RequireAuth><Dashboard /></RequireAuth>} />
-                <Route path="/courses" element={<RequireAuth><CourseCatalog /></RequireAuth>} />
-                <Route path="/course/:id" element={<RequireAuth><CourseDetail /></RequireAuth>} />
-                <Route path="/my-learning" element={<RequireAuth><MyLearning /></RequireAuth>} />
-                <Route path="/projects" element={<RequireAuth><ProjectsList /></RequireAuth>} />
-                <Route path="/create-project" element={<RequireAuth><CreateProject /></RequireAuth>} />
-                <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-                {/* Teacher-only routes */}
-                <Route path="/teacher/dashboard" element={<RequireTeacher><TeacherDashboard /></RequireTeacher>} />
-                <Route path="/teacher/create-course" element={<RequireTeacher><CreateCourse /></RequireTeacher>} />
-                {/* Auth routes */}
-                <Route path="/login" element={<AuthForm type="login" />} />
-                <Route path="/register" element={<AuthForm type="register" />} />
-                {/* Fallback */}
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
-              </Routes>
-            </main>
-          </div>
-        </Router>
-      </ToastProvider>
+      <SocketProvider>
+        <ToastProvider>
+          <ToastListWrapper />
+          <Router>
+            <div className="min-h-screen bg-gray-50">
+              <nav role="navigation">
+                <Navigation />
+              </nav>
+              <main role="main">
+                <Routes>
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/dashboard" element={<RequireAuth><DashboardRedirect /></RequireAuth>} />
+                  <Route path="/dashboard/student" element={<RequireAuth><Dashboard /></RequireAuth>} />
+                  <Route path="/courses" element={<RequireAuth><CourseCatalog /></RequireAuth>} />
+                  <Route path="/course/:id" element={<RequireAuth><CourseDetail /></RequireAuth>} />
+                  <Route path="/my-learning" element={<RequireAuth><MyLearning /></RequireAuth>} />
+                  <Route path="/projects" element={<RequireAuth><ProjectsList /></RequireAuth>} />
+                  <Route path="/create-project" element={<RequireAuth><CreateProject /></RequireAuth>} />
+                  <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+                  {/* Teacher-only routes */}
+                  <Route path="/teacher/dashboard" element={<RequireTeacher><TeacherDashboard /></RequireTeacher>} />
+                  <Route path="/teacher/create-course" element={<RequireTeacher><CreateCourse /></RequireTeacher>} />
+                  {/* Auth routes */}
+                  <Route path="/login" element={<AuthForm type="login" />} />
+                  <Route path="/register" element={<AuthForm type="register" />} />
+                  {/* Fallback */}
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
+              </main>
+            </div>
+          </Router>
+        </ToastProvider>
+      </SocketProvider>
     </AuthProvider>
   );
 }

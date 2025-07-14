@@ -147,7 +147,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ setCurrentView, set
           ) : (
             <div className="w-12 h-12 rounded-full bg-indigo-200 flex items-center justify-center text-xl font-bold text-indigo-700" aria-label="Your profile initials">
               {getInitials(user?.name)}
-            </div>
+          </div>
           )}
         </div>
       </header>
@@ -194,18 +194,18 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ setCurrentView, set
             {/* Add more course cards as needed */}
           </div>
         </section>
-        {/* Quick Actions */}
+                {/* Quick Actions */}
         <section>
           <h2 className="text-xl font-bold mb-4 text-indigo-700">Quick Actions</h2>
           <div className="flex flex-wrap gap-4">
             <button className="flex items-center gap-2 px-5 py-2 bg-indigo-500 text-white rounded-lg shadow hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" aria-label="Create new course">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
               Create Course
-            </button>
+                    </button>
             <button className="flex items-center gap-2 px-5 py-2 bg-indigo-100 text-indigo-700 rounded-lg shadow hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" aria-label="View analytics">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M11 17a2.5 2.5 0 002.5-2.5V7m-5 10a2.5 2.5 0 002.5-2.5V7m-5 10a2.5 2.5 0 002.5-2.5V7" /></svg>
               View Analytics
-            </button>
+                  </button>
           </div>
         </section>
       </main>
