@@ -7,6 +7,8 @@ import connectDB from './config/database.js';
 import User from './models/User.js';
 import Project from './models/Project.js';
 import Contribution from './models/Contribution.js';
+import multer from 'multer';
+import path from 'path';
 
 dotenv.config();
 
@@ -40,6 +42,42 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
+
+// Multer setup for avatar uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/avatars');
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    cb(null, req.user.userId + '-' + Date.now() + ext);
+  }
+});
+const fileFilter = (req, file, cb) => {
+  if (/image\/(jpeg|jpg|png|gif)/.test(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only image files are allowed!'), false);
+  }
+};
+const upload = multer({ storage, fileFilter });
+
+// Serve uploads directory as static
+app.use('/uploads', express.static('uploads'));
+
+// Avatar upload endpoint
+app.post('/api/users/avatar', authenticateToken, upload.single('avatar'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    await User.findByIdAndUpdate(req.user.userId, { avatar: avatarUrl });
+    res.json({ avatar: avatarUrl });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Routes
 

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider, useToast } from './context/ToastContext';
 import ToastList from './components/Toast';
 import Navigation from './components/Navigation';
@@ -14,51 +15,51 @@ import Profile from './components/Profile';
 import CreateProject from './components/CreateProject';
 import ProjectsList from './components/ProjectsList';
 
+// Route protection wrappers
+const RequireAuth = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  return user ? <>{children}</> : <Navigate to="/login" replace />;
+};
+
+const RequireTeacher = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  return user && user.role === 'teacher' ? <>{children}</> : <Navigate to="/dashboard" replace />;
+};
+
 function App() {
-  const [currentView, setCurrentView] = useState('dashboard');
-  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
-
-  const renderCurrentView = () => {
-    switch (currentView) {
-      case 'dashboard':
-        return <Dashboard setCurrentView={setCurrentView} />;
-      case 'courses':
-        return <CourseCatalog setCurrentView={setCurrentView} setSelectedCourse={setSelectedCourse} />;
-      case 'course-detail':
-        return <CourseDetail courseId={selectedCourse} setCurrentView={setCurrentView} />;
-      case 'create-course':
-        return <CreateCourse setCurrentView={setCurrentView} />;
-      case 'my-learning':
-        return <MyLearning setCurrentView={setCurrentView} setSelectedCourse={setSelectedCourse} />;
-      case 'teacher-dashboard':
-        return <TeacherDashboard setCurrentView={setCurrentView} setSelectedCourse={setSelectedCourse} />;
-      case 'profile':
-        return <Profile setCurrentView={setCurrentView} />;
-      case 'login':
-        return <AuthForm type="login" setCurrentView={setCurrentView} />;
-      case 'register':
-        return <AuthForm type="register" setCurrentView={setCurrentView} />;
-      case 'projects':
-        return <ProjectsList setCurrentView={setCurrentView} />;
-      case 'create-project':
-        return <CreateProject setCurrentView={setCurrentView} />;
-      default:
-        return <Dashboard setCurrentView={setCurrentView} />;
-    }
-  };
-
   return (
     <AuthProvider>
       <ToastProvider>
         <ToastListWrapper />
-        <div className="min-h-screen bg-gray-50">
-          <nav role="navigation">
-            <Navigation currentView={currentView} setCurrentView={setCurrentView} />
-          </nav>
-          <main role="main">
-            {renderCurrentView()}
-          </main>
-        </div>
+        <Router>
+          <div className="min-h-screen bg-gray-50">
+            <nav role="navigation">
+              <Navigation />
+            </nav>
+            <main role="main">
+              <Routes>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+                <Route path="/courses" element={<RequireAuth><CourseCatalog /></RequireAuth>} />
+                <Route path="/course/:id" element={<RequireAuth><CourseDetail /></RequireAuth>} />
+                <Route path="/my-learning" element={<RequireAuth><MyLearning /></RequireAuth>} />
+                <Route path="/projects" element={<RequireAuth><ProjectsList /></RequireAuth>} />
+                <Route path="/create-project" element={<RequireAuth><CreateProject /></RequireAuth>} />
+                <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+                {/* Teacher-only routes */}
+                <Route path="/teacher/dashboard" element={<RequireTeacher><TeacherDashboard /></RequireTeacher>} />
+                <Route path="/teacher/create-course" element={<RequireTeacher><CreateCourse /></RequireTeacher>} />
+                {/* Auth routes */}
+                <Route path="/login" element={<AuthForm type="login" />} />
+                <Route path="/register" element={<AuthForm type="register" />} />
+                {/* Fallback */}
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Routes>
+            </main>
+          </div>
+        </Router>
       </ToastProvider>
     </AuthProvider>
   );

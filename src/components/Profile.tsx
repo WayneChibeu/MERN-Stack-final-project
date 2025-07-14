@@ -1,15 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { User, Mail, Calendar, Award, BookOpen, Edit, Save, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from './ui/Button';
+import axios from 'axios';
+
+const getInitials = (name) => {
+  if (!name) return '';
+  const parts = name.split(' ');
+  return parts.map((p) => p[0]).join('').toUpperCase();
+};
 
 interface ProfileProps {
   setCurrentView: (view: string) => void;
 }
 
 const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { showToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -21,6 +28,9 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
     linkedin: '',
     twitter: ''
   });
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || '');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const handleSave = () => {
     try {
@@ -44,6 +54,29 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
       twitter: ''
     });
     setIsEditing(false);
+  };
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setAvatarPreview(URL.createObjectURL(file));
+    const formData = new FormData();
+    formData.append('avatar', file);
+    setUploading(true);
+    try {
+      const res = await axios.post('/api/users/avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      setUser((prev) => ({ ...prev, avatar: res.data.avatar }));
+      setAvatarPreview(res.data.avatar);
+    } catch (err) {
+      showToast('Failed to upload avatar.', 'error');
+    } finally {
+      setUploading(false);
+    }
   };
 
   // Mock user statistics
@@ -133,10 +166,10 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
           <div className="relative px-4 sm:px-6 pb-4 sm:pb-6">
             <div className="flex flex-col sm:flex-row sm:items-end space-y-4 sm:space-y-0 sm:space-x-6 -mt-12 sm:-mt-16">
               <div className="w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center mx-auto sm:mx-0">
-                {user?.avatar ? (
+                {avatarPreview ? (
                   <img
-                    src={user.avatar}
-                    alt={user.name}
+                    src={avatarPreview}
+                    alt={user?.name}
                     className="w-full h-full rounded-full object-cover"
                   />
                 ) : (

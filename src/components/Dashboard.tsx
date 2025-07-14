@@ -1,13 +1,16 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { BookOpen, Users, Award, TrendingUp, Play, Clock, Star, Globe } from 'lucide-react';
 import { sdg4Data, educationCategories } from '../data/sdg4';
 import { useAuth } from '../context/AuthContext';
 
-interface DashboardProps {
-  setCurrentView: (view: string) => void;
-}
+const getInitials = (name) => {
+  if (!name) return '';
+  const parts = name.split(' ');
+  return parts.map((p) => p[0]).join('').toUpperCase();
+};
 
-const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
+const Dashboard: React.FC = () => {
   const { user } = useAuth();
 
   const stats = [
@@ -76,6 +79,24 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+      <header className="relative z-10 bg-teal-600 text-white px-8 py-6 rounded-b-2xl shadow flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">Student Dashboard</h1>
+        <div className="flex items-center gap-4">
+          <span className="px-4 py-1 rounded-full bg-white text-teal-700 font-semibold shadow text-sm ml-4" aria-label="Student role">Student</span>
+          {user?.avatar ? (
+            <img
+              src={user.avatar}
+              alt="Your profile"
+              className="w-12 h-12 rounded-full border-2 border-white shadow object-cover"
+              aria-label="Your profile"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-teal-200 flex items-center justify-center text-xl font-bold text-teal-700" aria-label="Your profile initials">
+              {getInitials(user?.name)}
+            </div>
+          )}
+        </div>
+      </header>
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white section-lg">
         <div className="max-w-7xl mx-auto container-padding">
@@ -95,19 +116,19 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
               Supporting SDG 4: Ensure inclusive and equitable quality education and promote lifelong learning opportunities for everyone
             </p>
             <div className="btn-group justify-center">
-              <button
-                onClick={() => setCurrentView('courses')}
+              <Link
+                to="/courses"
                 className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Explore Courses
-              </button>
+              </Link>
               {user?.role === 'teacher' && (
-                <button
-                  onClick={() => setCurrentView('create-course')}
+                <Link
+                  to="/teacher/create-course"
                   className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-white"
                 >
                   Create Course
-                </button>
+                </Link>
               )}
             </div>
           </div>
@@ -176,10 +197,10 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Education Categories</h2>
           <div className="grid-responsive">
             {educationCategories.map((category) => (
-              <div
+              <Link
                 key={category.id}
-                className="card p-6 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
-                onClick={() => setCurrentView('courses')}
+                to="/courses"
+                className="card p-6 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105 block"
               >
                 <div className="flex items-center space-x-4 mb-4">
                   <div
@@ -197,7 +218,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
                   <span>{Math.floor(Math.random() * 500) + 100} courses</span>
                   <span className="text-blue-600 hover:underline">Explore →</span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -206,12 +227,12 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
         <div className="mb-12">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900">Featured Courses</h2>
-            <button
-              onClick={() => setCurrentView('courses')}
+            <Link
+              to="/courses"
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
               View All Courses →
-            </button>
+            </Link>
           </div>
           <div className="grid-responsive">
             {featuredCourses.map((course) => (
@@ -267,19 +288,19 @@ const Dashboard: React.FC<DashboardProps> = ({ setCurrentView }) => {
             or an educator ready to share your expertise, EduConnect is your platform for impact.
           </p>
           <div className="btn-group justify-center">
-            <button
-              onClick={() => setCurrentView(user ? 'my-learning' : 'register')}
+            <Link
+              to={user ? '/my-learning' : '/register'}
               className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
               {user ? 'My Learning' : 'Start Learning'}
-            </button>
+            </Link>
             {(!user || user.role === 'teacher') && (
-              <button
-                onClick={() => setCurrentView(user ? 'create-course' : 'register')}
+              <Link
+                to={user ? '/create-course' : '/register'}
                 className="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
               >
                 {user ? 'Create Course' : 'Become an Educator'}
-              </button>
+              </Link>
             )}
           </div>
         </div>

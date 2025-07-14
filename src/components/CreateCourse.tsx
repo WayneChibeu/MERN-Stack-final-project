@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, X, Upload, Video, FileText, HelpCircle, Save } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { educationCategories, courseSubjects } from '../data/sdg4';
@@ -36,11 +37,12 @@ interface Quiz {
   passing_score: number;
 }
 
-const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
+const CreateCourse: React.FC = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Course basic info
   const [courseData, setCourseData] = useState({
@@ -172,7 +174,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
       console.log('Course created:', coursePayload);
       // Here you would send to your API
       showToast('Course created successfully!', 'success');
-      setCurrentView('teacher-dashboard');
+      navigate('/teacher/dashboard');
     } catch (error) {
       console.error('Error creating course:', error);
       showToast('Error creating course. Please try again.', 'error');
@@ -194,7 +196,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ setCurrentView }) => {
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <button
-            onClick={() => setCurrentView('teacher-dashboard')}
+            onClick={() => navigate('/teacher/dashboard')}
             className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />

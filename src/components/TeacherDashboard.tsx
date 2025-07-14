@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Plus, BookOpen, Users, DollarSign, TrendingUp, Eye, Edit, Trash2, MessageCircle, BarChart3 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-interface TeacherDashboardProps {
-  setCurrentView: (view: string) => void;
-  setSelectedCourse: (courseId: string) => void;
-}
+const getInitials = (name) => {
+  if (!name) return '';
+  const parts = name.split(' ');
+  return parts.map((p) => p[0]).join('').toUpperCase();
+};
 
 const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ setCurrentView, setSelectedCourse }) => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
+  const navigate = useNavigate();
 
   // Mock teacher data
   const teacherStats = {
@@ -104,16 +107,13 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ setCurrentView, set
   const handleCourseAction = (action: string, courseId: string) => {
     switch (action) {
       case 'view':
-        setSelectedCourse(courseId);
-        setCurrentView('course-detail');
+        navigate(`/course/${courseId}`);
         break;
       case 'edit':
-        // Navigate to edit course
-        console.log('Edit course:', courseId);
+        // Navigate to edit course (implement as needed)
         break;
       case 'delete':
-        // Delete course
-        console.log('Delete course:', courseId);
+        // Delete course (implement as needed)
         break;
       default:
         break;
@@ -121,366 +121,94 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ setCurrentView, set
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Teacher Dashboard</h1>
-            <p className="text-gray-600">Welcome back, {user?.name}! Manage your courses and track your impact.</p>
-          </div>
-          <button
-            onClick={() => setCurrentView('create-course')}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            <span>Create Course</span>
-          </button>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-100 relative">
+      {/* Subtle background pattern */}
+      <svg
+        className="absolute top-0 right-0 w-64 h-64 opacity-10 pointer-events-none z-0"
+        viewBox="0 0 200 200"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <circle cx="100" cy="100" r="100" fill="#6366F1" />
+      </svg>
+      {/* Header with Teacher badge and avatar */}
+      <header className="relative z-10 bg-indigo-600 text-white px-8 py-6 rounded-b-2xl shadow flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">Teacher Dashboard</h1>
+        <div className="flex items-center gap-4">
+          <span className="px-4 py-1 rounded-full bg-white text-indigo-700 font-semibold shadow text-sm ml-4" aria-label="Teacher role">Teacher</span>
+          {user?.avatar ? (
+            <img
+              src={user.avatar}
+              alt="Your profile"
+              className="w-12 h-12 rounded-full border-2 border-white shadow object-cover"
+              aria-label="Your profile"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-indigo-200 flex items-center justify-center text-xl font-bold text-indigo-700" aria-label="Your profile initials">
+              {getInitials(user?.name)}
+            </div>
+          )}
         </div>
-
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Courses</p>
-                <p className="text-3xl font-bold text-gray-900">{teacherStats.totalCourses}</p>
-                <p className="text-sm text-green-600">+2 this month</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-blue-600" />
-              </div>
+      </header>
+      <main className="relative z-10 max-w-5xl mx-auto px-4">
+        {/* Example stats/analytics cards */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <div className="bg-white rounded-xl shadow border-t-4 border-indigo-500 p-6 flex flex-col items-start focus-within:ring-2 focus-within:ring-indigo-400" tabIndex={0} aria-label="Total Courses">
+            <div className="flex items-center mb-2">
+              <svg className="w-6 h-6 text-indigo-500 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0112 21.5a12.083 12.083 0 01-6.16-10.922L12 14z" /></svg>
+              <span className="text-lg font-semibold">Total Courses</span>
             </div>
+            <span className="text-3xl font-bold text-indigo-700">8</span>
           </div>
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Students</p>
-                <p className="text-3xl font-bold text-gray-900">{teacherStats.totalStudents.toLocaleString()}</p>
-                <p className="text-sm text-green-600">+{teacherStats.newEnrollments} this month</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <Users className="w-6 h-6 text-green-600" />
-              </div>
+          <div className="bg-white rounded-xl shadow border-t-4 border-indigo-500 p-6 flex flex-col items-start focus-within:ring-2 focus-within:ring-indigo-400" tabIndex={0} aria-label="Active Students">
+            <div className="flex items-center mb-2">
+              <svg className="w-6 h-6 text-indigo-500 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-4a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+              <span className="text-lg font-semibold">Active Students</span>
             </div>
+            <span className="text-3xl font-bold text-indigo-700">120</span>
           </div>
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                <p className="text-3xl font-bold text-gray-900">${teacherStats.totalRevenue.toLocaleString()}</p>
-                <p className="text-sm text-green-600">+${teacherStats.monthlyEarnings} this month</p>
-              </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-purple-600" />
-              </div>
+          <div className="bg-white rounded-xl shadow border-t-4 border-indigo-500 p-6 flex flex-col items-start focus-within:ring-2 focus-within:ring-indigo-400" tabIndex={0} aria-label="Assignments Graded">
+            <div className="flex items-center mb-2">
+              <svg className="w-6 h-6 text-indigo-500 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2a4 4 0 018 0v2M3 7v4a1 1 0 001 1h3m10-5h2a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h2" /></svg>
+              <span className="text-lg font-semibold">Assignments Graded</span>
             </div>
+            <span className="text-3xl font-bold text-indigo-700">56</span>
           </div>
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Average Rating</p>
-                <p className="text-3xl font-bold text-gray-900">{teacherStats.averageRating}</p>
-                <p className="text-sm text-green-600">Excellent performance</p>
+        </section>
+        {/* Your Courses section */}
+        <section className="mb-10">
+          <h2 className="text-xl font-bold mb-4 text-indigo-700">Your Courses</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Example course card */}
+            <div className="bg-white rounded-xl shadow border-l-4 border-indigo-500 p-5 flex flex-col focus-within:ring-2 focus-within:ring-indigo-400" tabIndex={0} aria-label="Course: Modern Web Development">
+              <div className="flex items-center mb-2">
+                <svg className="w-5 h-5 text-indigo-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 20h9" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m0 0H3" /></svg>
+                <span className="font-semibold">Modern Web Development</span>
               </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-orange-600" />
-              </div>
+              <span className="text-sm text-gray-500 mb-2">Enrolled: 40 students</span>
+              <button className="mt-auto self-end px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" aria-label="View course details">
+                View Details
+              </button>
             </div>
+            {/* Add more course cards as needed */}
           </div>
-        </div>
-
-        {/* Tabs */}
-        <div className="bg-white rounded-xl shadow-md">
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6">
-              {[
-                { id: 'overview', label: 'Overview' },
-                { id: 'courses', label: 'My Courses', count: myCourses.length },
-                { id: 'analytics', label: 'Analytics' },
-                { id: 'discussions', label: 'Discussions' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
-                    activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <span>{tab.label}</span>
-                  {tab.count && (
-                    <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
-                      {tab.count}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </nav>
+        </section>
+        {/* Quick Actions */}
+        <section>
+          <h2 className="text-xl font-bold mb-4 text-indigo-700">Quick Actions</h2>
+          <div className="flex flex-wrap gap-4">
+            <button className="flex items-center gap-2 px-5 py-2 bg-indigo-500 text-white rounded-lg shadow hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" aria-label="Create new course">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+              Create Course
+            </button>
+            <button className="flex items-center gap-2 px-5 py-2 bg-indigo-100 text-indigo-700 rounded-lg shadow hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" aria-label="View analytics">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M11 17a2.5 2.5 0 002.5-2.5V7m-5 10a2.5 2.5 0 002.5-2.5V7m-5 10a2.5 2.5 0 002.5-2.5V7" /></svg>
+              View Analytics
+            </button>
           </div>
-
-          <div className="p-6">
-            {/* Overview Tab */}
-            {activeTab === 'overview' && (
-              <div className="space-y-6">
-                {/* Quick Actions */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button
-                      onClick={() => setCurrentView('create-course')}
-                      className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-center"
-                    >
-                      <Plus className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                      <p className="font-medium text-gray-700">Create New Course</p>
-                      <p className="text-sm text-gray-500">Start building your next course</p>
-                    </button>
-                    <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center">
-                      <MessageCircle className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                      <p className="font-medium text-gray-700">View Discussions</p>
-                      <p className="text-sm text-gray-500">Engage with your students</p>
-                    </button>
-                    <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center">
-                      <BarChart3 className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                      <p className="font-medium text-gray-700">View Analytics</p>
-                      <p className="text-sm text-gray-500">Track your performance</p>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Recent Activity */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
-                      <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                      <p className="text-sm text-gray-700">
-                        <span className="font-medium">23 new enrollments</span> in "Digital Literacy Fundamentals"
-                      </p>
-                      <span className="text-xs text-gray-500">2 hours ago</span>
-                    </div>
-                    <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
-                      <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                      <p className="text-sm text-gray-700">
-                        <span className="font-medium">New 5-star review</span> on "Advanced Web Development"
-                      </p>
-                      <span className="text-xs text-gray-500">5 hours ago</span>
-                    </div>
-                    <div className="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg">
-                      <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
-                      <p className="text-sm text-gray-700">
-                        <span className="font-medium">$340 earned</span> from course sales today
-                      </p>
-                      <span className="text-xs text-gray-500">1 day ago</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Top Performing Courses */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Performing Courses</h3>
-                  <div className="space-y-3">
-                    {analyticsData.topCourses.map((course, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div>
-                          <h4 className="font-medium text-gray-900">{course.title}</h4>
-                          <p className="text-sm text-gray-500">{course.students} students enrolled</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium text-gray-900" title="Total revenue from this course">${course.revenue.toLocaleString()}</p>
-                          <p className="text-sm text-gray-500">Revenue</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* My Courses Tab */}
-            {activeTab === 'courses' && (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold text-gray-900">My Courses ({myCourses.length})</h3>
-                  <button
-                    onClick={() => setCurrentView('create-course')}
-                    className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>New Course</span>
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {myCourses.map((course) => (
-                    <div key={course.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                      <div className="flex items-start space-x-4">
-                        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                          <img
-                            src={course.image}
-                            alt={course.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between mb-2">
-                            <div>
-                              <h4 className="font-bold text-gray-900 mb-1">{course.title}</h4>
-                              <p className="text-sm text-gray-600">{course.category}</p>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                course.status === 'published' 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : 'bg-yellow-100 text-yellow-800'
-                              }`}>
-                                {course.status.charAt(0).toUpperCase() + course.status.slice(1)}
-                              </span>
-                            </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-                            <div>
-                              <span className="text-gray-500">Students:</span>
-                              <p className="font-medium text-gray-900" title="Number of students enrolled">{course.students.toLocaleString()}</p>
-                            </div>
-                            <div>
-                              <span className="text-gray-500">Revenue:</span>
-                              <p className="font-medium text-gray-900" title="Total revenue from this course">
-                                {course.revenue === 0 ? 'Free' : `$${course.revenue.toLocaleString()}`}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-gray-500">Rating:</span>
-                              <p className="font-medium text-gray-900" title="Average course rating">{course.rating} ⭐</p>
-                            </div>
-                            <div>
-                              <span className="text-gray-500">Price:</span>
-                              <p className="font-medium text-gray-900" title="Current price for this course">
-                                {course.price === 0 ? 'Free' : `$${course.price}`}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500">
-                              Updated: {course.lastUpdated}
-                            </span>
-                            <div className="flex space-x-2">
-                              <button
-                                onClick={() => handleCourseAction('view', course.id)}
-                                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                title="View Course"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleCourseAction('edit', course.id)}
-                                className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
-                                title="Edit Course"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleCourseAction('delete', course.id)}
-                                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
-                                title="Delete Course"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Analytics Tab */}
-            {activeTab === 'analytics' && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-semibold text-gray-900">Course Analytics</h3>
-                
-                {/* Enrollment Trend */}
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-4">Monthly Enrollments</h4>
-                  <div className="flex items-end space-x-4 h-40">
-                    {analyticsData.enrollmentTrend.map((data, index) => (
-                      <div key={index} className="flex flex-col items-center">
-                        <div
-                          className="bg-blue-600 rounded-t w-8"
-                          style={{ height: `${(data.enrollments / 200) * 100}%` }}
-                        />
-                        <span className="text-xs text-gray-600 mt-2">{data.month}</span>
-                        <span className="text-xs font-medium text-gray-900">{data.enrollments}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Course Performance */}
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Course Performance</h4>
-                  <div className="space-y-4">
-                    {myCourses.filter(course => course.status === 'published').map((course) => (
-                      <div key={course.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 rounded-lg overflow-hidden">
-                            <img
-                              src={course.image}
-                              alt={course.title}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div>
-                            <h5 className="font-medium text-gray-900">{course.title}</h5>
-                            <p className="text-sm text-gray-500">{course.students} students</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-6 text-sm">
-                          <div className="text-center">
-                            <p className="font-medium text-gray-900">{course.enrollments}</p>
-                            <p className="text-gray-500">New enrollments</p>
-                          </div>
-                          <div className="text-center">
-                            <p className="font-medium text-gray-900">{course.completions}</p>
-                            <p className="text-gray-500">Completions</p>
-                          </div>
-                          <div className="text-center">
-                            <p className="font-medium text-gray-900">{course.rating}</p>
-                            <p className="text-gray-500">Rating</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Discussions Tab */}
-            {activeTab === 'discussions' && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-semibold text-gray-900">Course Discussions</h3>
-                <div className="text-center py-12">
-                  <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h4 className="text-lg font-medium text-gray-900 mb-2">No discussions yet</h4>
-                  <p className="text-gray-600 mb-6">
-                    Students haven't started any discussions in your courses yet. 
-                    Encourage engagement by asking questions in your course content.
-                  </p>
-                  <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                    Start a Discussion
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 };
