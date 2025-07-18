@@ -2,18 +2,22 @@
 
 > **Note:** This project is required as part of the final project for the PLP Project Africa program, fulfilling the program's requirements for practical application and demonstration of MERN stack skills.
 
-## Table of Contents
+---
+
+## 🏆 Capstone Project Submission
+
+### Table of Contents
 - [Project Overview](#project-overview)
 - [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Folder Structure](#folder-structure)
+- [Technical Architecture](#technical-architecture)
+- [Screenshots](#screenshots)
+- [Video Demonstration](#video-demonstration)
 - [Setup Instructions](#setup-instructions)
-- [Environment Variables](#environment-variables)
+- [API Documentation](#api-documentation)
+- [Testing](#testing)
 - [Deployment](#deployment)
-- [Usage Guide](#usage-guide)
-- [API Overview](#api-overview)
-- [FAQ](#faq)
-- [Contribution Guidelines](#contribution-guidelines)
+- [Project Roadmap & Milestones](#project-roadmap--milestones)
+- [Not Yet Implemented / Future Improvements](#not-yet-implemented--future-improvements)
 - [License](#license)
 
 ---
@@ -31,29 +35,26 @@ EduConnect is a comprehensive MERN stack platform designed to support the United
 - **Global Statistics:** Real-time data and progress tracking for SDG 4 targets and global education metrics.
 - **Responsive UI:** Modern, mobile-friendly interface built with React and Tailwind CSS.
 
-## Technologies Used
-- **Frontend:** React, TypeScript, Vite, Tailwind CSS, Chart.js, React Router
-- **Backend:** Node.js, Express.js, MongoDB (Mongoose), JWT, bcryptjs, Multer
-- **Real-time:** Socket.io for live updates and collaboration
-- **Other:** ESLint, PostCSS, dotenv, lucide-react
+## Technical Architecture
+- **Wireframes/Mockups:** <!-- TODO: Add wireframes or mockup images/links here -->
+- **Database Schema:** <!-- TODO: Add ER diagram or schema description here -->
+- **API Endpoints:** <!-- TODO: Add or link to API documentation below -->
+- **Data Flow:** <!-- TODO: Add a brief description or diagram of data flow -->
+- **Key Technical Decisions:** <!-- TODO: List any important technical choices made -->
 
-## Folder Structure
-```
-├── server/
-│   ├── index.js                # Express server entry point
-│   ├── config/database.js      # MongoDB connection setup
-│   ├── models/                 # Mongoose models (User, Project, Contribution)
-├── src/
-│   ├── App.tsx                 # Main React app component
-│   ├── components/             # UI components (Dashboard, CourseCatalog, etc.)
-│   ├── context/                # React context (AuthContext)
-│   ├── data/                   # Static data (SDGs, SDG4 targets)
-│   ├── types/                  # TypeScript interfaces
-├── package.json                # Project metadata and scripts
-├── vite.config.ts              # Vite configuration
-├── tailwind.config.js          # Tailwind CSS configuration
-├── README.md                   # Project documentation
-```
+## Screenshots
+Below are some screenshots of key features and pages:
+
+![Sign In Page](images/Sign-in-page%20screenshot.png)
+![Dashboard](images/Dashboard-screenshot.png)
+![Course Catalogue](images/Course-catalogue-screenshot.png)
+![My Learning Dashboard](images/My-Learning-Dashboard-screenshot.png)
+![Profile](images/Profile-screenshot.png)
+![Project](images/Project-screenshot%20.png)
+
+## Video Demonstration
+<!-- TODO: Add a link to your 5-10 minute demo video here -->
+*Video demo coming soon! The demo will be available via Google Drive.*
 
 ## Setup Instructions
 ### Backend
