@@ -13,7 +13,7 @@ const NOTIFICATION_SOUNDS = [
   },
   {
     label: 'Pop',
-    url: 'https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b6b7e.mp3',
+    url: '/audio_12b6fae7b2.mp3',
   },
   {
     label: 'Bell',

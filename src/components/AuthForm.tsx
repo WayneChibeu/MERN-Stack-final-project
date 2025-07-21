@@ -3,6 +3,7 @@ import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from './ui/Button';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthFormProps {
   type: 'login' | 'register';
@@ -23,6 +24,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, setCurrentView }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,8 +44,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, setCurrentView }) => {
       } else {
         await login(formData.email, formData.password);
         showToast('Login successful! Welcome back!', 'success');
+        navigate('/dashboard');
       }
-      setCurrentView('dashboard');
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'An error occurred';
       setError(msg);
@@ -129,6 +131,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, setCurrentView }) => {
                   name="email"
                   type="email"
                   required
+                  autoComplete="email"
                   className="appearance-none relative block w-full pl-10 pr-4 py-3 sm:py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg sm:text-sm"
                   placeholder="Enter your email address"
                   value={formData.email}
@@ -148,6 +151,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, setCurrentView }) => {
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
+                  autoComplete="current-password"
                   className="appearance-none relative block w-full pl-10 pr-12 py-3 sm:py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg sm:text-sm"
                   placeholder="Enter your password"
                   value={formData.password}
