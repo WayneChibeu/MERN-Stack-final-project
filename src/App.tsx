@@ -16,6 +16,7 @@ import CreateProject from './components/CreateProject';
 import ProjectsList from './components/ProjectsList';
 import { SocketProvider } from './context/SocketContext';
 import Footer from './components/Footer';
+import NotificationSettings from './components/NotificationSettings';
 
 // Route protection wrappers
 const RequireAuth = ({ children }: { children: React.ReactNode }) => {
@@ -61,6 +62,7 @@ function App() {
                   <Route path="/projects" element={<RequireAuth><ProjectsList /></RequireAuth>} />
                   <Route path="/create-project" element={<RequireAuth><CreateProject /></RequireAuth>} />
                   <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+                  <Route path="/settings/notifications" element={<RequireAuth><NotificationSettings /></RequireAuth>} />
                   {/* Teacher-only routes */}
                   <Route path="/teacher/dashboard" element={<RequireTeacher><TeacherDashboard /></RequireTeacher>} />
                   <Route path="/teacher/create-course" element={<RequireTeacher><CreateCourse /></RequireTeacher>} />
