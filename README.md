@@ -1,29 +1,10 @@
-# EduConnect SDG 4 Quality Education Platform
+# EduConnect
 
-> **Note:** This project is required as part of the final project for the PLP Project Africa program, fulfilling the program's requirements for practical application and demonstration of MERN stack skills.
+A MERN stack application focused on connecting educators and learners while supporting UN Sustainable Development Goal 4 (Quality Education).
 
----
+## Video Demo
 
-## 🏆 Capstone Project Submission
-
-### Table of Contents
-- [Project Overview](#project-overview)
-- [Features](#features)
-- [Technical Architecture](#technical-architecture)
-- [Screenshots](#screenshots)
-- [Video Demonstration](#video-demonstration)
-- [Setup Instructions](#setup-instructions)
-- [API Documentation](#api-documentation)
-- [Testing](#testing)
-- [Deployment](#deployment)
-- [Project Roadmap & Milestones](#project-roadmap--milestones)
-- [Not Yet Implemented / Future Improvements](#not-yet-implemented--future-improvements)
-- [License](#license)
-
----
-
-## Project Overview
-EduConnect is a comprehensive MERN stack platform designed to support the United Nations Sustainable Development Goal 4 (SDG 4): Quality Education. The platform enables students, teachers, and administrators to access, create, and manage educational resources, courses, and collaborative projects. It aims to promote inclusive, equitable, and lifelong learning opportunities for all.
+Check out our video demonstration: [EduConnect Demo](https://drive.google.com/file/d/13t-i236d3Nx2M7vcPnkAyjqC2S0ILdnr/view?usp=drive_link)
 
 ## Features
 - **User Authentication:** Secure registration, login, and profile management for students, teachers, and admins.

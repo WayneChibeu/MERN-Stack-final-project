@@ -4,12 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { sdgsData } from '../data/sdgs';
 import Button from './ui/Button';
+import { useNavigate } from 'react-router-dom';
 
-interface CreateProjectProps {
-  setCurrentView: (view: string) => void;
-}
-
-const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
+const CreateProject: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -43,7 +41,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
       // Here you would call your API to create the project
       
       showToast('Project created successfully!', 'success');
-      setCurrentView('projects');
+      navigate('/projects');
     } catch (error) {
       console.error('Error creating project:', error);
       showToast('Error creating project. Please try again.', 'error');
@@ -66,7 +64,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <button
-            onClick={() => setCurrentView('projects')}
+            onClick={() => navigate('/projects')}
             className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
@@ -184,7 +182,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({ setCurrentView }) => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setCurrentView('projects')}
+                onClick={() => navigate('/projects')}
                 fullWidth={false}
               >
                 Cancel
