@@ -10,6 +10,23 @@ const getInitials = (name) => {
   return parts.map((p) => p[0]).join('').toUpperCase();
 };
 
+const motivationalQuotes = [
+  "Learning never exhausts the mind. – Leonardo da Vinci",
+  "The beautiful thing about learning is nobody can take it away from you. – B.B. King",
+  "Education is the most powerful weapon which you can use to change the world. – Nelson Mandela",
+  "Success is the sum of small efforts, repeated day in and day out. – Robert Collier",
+  "The future belongs to those who learn more skills and combine them in creative ways. – Robert Greene",
+  "The expert in anything was once a beginner. – Helen Hayes",
+  "Don’t let what you cannot do interfere with what you can do. – John Wooden",
+  "Strive for progress, not perfection.",
+  "Your education is a dress rehearsal for a life that is yours to lead. – Nora Ephron",
+  "Push yourself, because no one else is going to do it for you."
+];
+
+function getRandomQuote() {
+  return motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+}
+
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
 
@@ -77,21 +94,31 @@ const Dashboard: React.FC = () => {
     }
   ];
 
+  const quote = getRandomQuote();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <header className="relative z-10 bg-teal-600 text-white px-8 py-6 rounded-b-2xl shadow flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Student Dashboard</h1>
-        <div className="flex items-center gap-4">
-          <span className="px-4 py-1 rounded-full bg-white text-teal-700 font-semibold shadow text-sm ml-4" aria-label="Student role">Student</span>
+      <header className="relative z-10 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-2xl shadow-lg px-10 py-8 flex flex-col sm:flex-row items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-1">
+            Welcome back{user?.name ? `, ${user.name.split(' ')[0]}` : ''}!
+          </h1>
+          <p className="text-white text-opacity-80 text-lg">Here’s your learning dashboard</p>
+          <blockquote className="mt-4 text-base italic text-cyan-100 border-l-4 border-cyan-200 pl-4">
+            {quote}
+          </blockquote>
+        </div>
+        <div className="flex items-center gap-4 mt-6 sm:mt-0">
+          <span className="px-4 py-1 rounded-full bg-white text-teal-700 font-semibold shadow text-sm" aria-label="Student role">Student</span>
           {user?.avatar ? (
             <img
               src={user.avatar}
               alt="Your profile"
-              className="w-12 h-12 rounded-full border-2 border-white shadow object-cover"
+              className="w-14 h-14 rounded-full border-2 border-white shadow object-cover"
               aria-label="Your profile"
             />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-teal-200 flex items-center justify-center text-xl font-bold text-teal-700" aria-label="Your profile initials">
+            <div className="w-14 h-14 rounded-full bg-teal-200 flex items-center justify-center text-2xl font-bold text-teal-700" aria-label="Your profile initials">
               {getInitials(user?.name)}
             </div>
           )}
@@ -135,176 +162,56 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto container-padding section">
-        {/* Stats Section */}
-        <div className="grid-responsive-4 mb-12">
-          {stats.map((stat, index) => (
-            <div key={index} className="card p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-small font-medium">{stat.title}</p>
-                  <p className="text-3xl font-bold text-gray-900" title={stat.title}>{stat.value}</p>
-                  <p className="text-small text-green-600 font-medium">{stat.change} this month</p>
-                </div>
-                <div className={`w-12 h-12 ${stat.color} rounded-full flex items-center justify-center`} title={stat.title}>
-                  <stat.icon className="w-6 h-6 text-white" />
-                </div>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Stats Cards */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          {stats.map((stat) => (
+            <div key={stat.title} className={`rounded-xl shadow-md p-6 flex flex-col items-start bg-white hover:shadow-lg transition-shadow duration-200 border-t-4 ${stat.color}`}>
+              <div className="flex items-center mb-4">
+                <stat.icon className="h-7 w-7 text-white bg-opacity-80 rounded-full p-1 mr-3" />
+                <span className="text-lg font-semibold text-gray-800">{stat.title}</span>
               </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
+              <div className="text-sm text-green-600 font-medium">{stat.change}</div>
             </div>
           ))}
-        </div>
+        </section>
 
-        {/* SDG 4 Progress */}
-        <div className="card p-8 mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">SDG 4: Quality Education Progress</h2>
-              <p className="text-gray-600 leading-relaxed">Global progress towards ensuring inclusive and equitable quality education</p>
-            </div>
-            <div className="text-right">
-              <div className="text-3xl font-bold text-blue-600">{sdg4Data.progress}%</div>
-              <div className="text-small text-gray-500">Global Progress</div>
-            </div>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-4 mb-6">
-            <div
-              className="h-4 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-500"
-              style={{ width: `${sdg4Data.progress}%` }}
-            />
-          </div>
-          <div className="grid-responsive-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-gray-900" title="Total number of out-of-school children worldwide">{sdg4Data.globalStats.outOfSchoolChildren.toLocaleString()}</div>
-              <div className="text-small text-gray-600">Out-of-school children</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900" title="Percentage of people globally who can read and write">{sdg4Data.globalStats.literacyRate}%</div>
-              <div className="text-small text-gray-600">Global literacy rate</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900" title="Percentage of children who complete primary school">{sdg4Data.globalStats.completionRatePrimary}%</div>
-              <div className="text-small text-gray-600">Primary completion</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900" title="Percentage of children who complete secondary school">{sdg4Data.globalStats.completionRateSecondary}%</div>
-              <div className="text-small text-gray-600">Secondary completion</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Education Categories */}
-        <div className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Education Categories</h2>
-          <div className="grid-responsive">
-            {educationCategories.map((category) => (
-              <Link
-                key={category.id}
-                to="/courses"
-                className="card p-6 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105 block"
-              >
-                <div className="flex items-center space-x-4 mb-4">
-                  <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center text-white"
-                    style={{ backgroundColor: category.color }}
-                  >
-                    <BookOpen className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900">{category.name}</h3>
-                    <p className="text-small text-gray-600">{category.description}</p>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center text-small text-gray-500">
-                  <span>{Math.floor(Math.random() * 500) + 100} courses</span>
-                  <span className="text-blue-600 hover:underline">Explore →</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
+        {/* Quick Actions */}
+        <section className="flex flex-wrap gap-4 mb-10 justify-center">
+          <Link to="/courses" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow transition">Browse Courses</Link>
+          <Link to="/my-learning" className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow transition">My Learning</Link>
+          <Link to="/projects" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold shadow transition">Projects</Link>
+          <Link to="/profile" className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold shadow transition">Profile</Link>
+        </section>
 
         {/* Featured Courses */}
-        <div className="mb-12">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Featured Courses</h2>
-            <Link
-              to="/courses"
-              className="text-blue-600 hover:text-blue-700 font-medium"
-            >
-              View All Courses →
-            </Link>
-          </div>
-          <div className="grid-responsive">
+        <section>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Featured Courses</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredCourses.map((course) => (
-              <div key={course.id} className="card overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="relative">
-                  <img
-                    src={course.image}
-                    alt={course.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                      {course.category}
-                    </span>
+              <div key={course.id} className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden flex flex-col">
+                <img src={course.image} alt={course.title} className="h-40 w-full object-cover" />
+                <div className="p-5 flex-1 flex flex-col">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">{course.title}</h3>
+                  <p className="text-sm text-gray-500 mb-2">By {course.instructor}</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Star className="w-4 h-4 text-yellow-400" />
+                    <span className="text-sm font-medium text-gray-700">{course.rating}</span>
+                    <span className="text-xs text-gray-400">({course.students} students)</span>
                   </div>
-                  <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-                    <Play className="w-12 h-12 text-white opacity-0 hover:opacity-100 transition-opacity" />
+                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+                    <Clock className="w-4 h-4" />
+                    <span>{course.duration}</span>
+                    <span className="ml-2 px-2 py-0.5 rounded bg-blue-50 text-blue-600 font-medium">{course.category}</span>
                   </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{course.title}</h3>
-                  <p className="text-gray-600 text-small mb-4">by {course.instructor}</p>
-                  <div className="flex items-center justify-between text-small text-gray-500 mb-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-1">
-                        <Users className="w-4 h-4" />
-                        <span>{course.students.toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-4 h-4" />
-                        <span>{course.duration}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="font-medium">{course.rating}</span>
-                    </div>
-                  </div>
-                  <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Enroll Now
-                  </button>
+                  <Link to={`/courses/${course.id}`} className="mt-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold shadow transition text-center">View Course</Link>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Call to Action */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-md p-8 text-center text-white">
-          <h3 className="text-2xl font-bold mb-6 text-white">Join the Education Revolution</h3>
-          <p className="text-lg mb-8 opacity-90 leading-relaxed text-white/80">
-            Be part of the global movement to ensure quality education for all. Whether you're a learner seeking knowledge 
-            or an educator ready to share your expertise, EduConnect is your platform for impact.
-          </p>
-          <div className="btn-group justify-center">
-            <Link
-              to={user ? '/my-learning' : '/register'}
-              className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-            >
-              {user ? 'My Learning' : 'Start Learning'}
-            </Link>
-            {(!user || user.role === 'teacher') && (
-              <Link
-                to={user ? '/create-course' : '/register'}
-                className="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
-              >
-                {user ? 'Create Course' : 'Become an Educator'}
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 };
