@@ -124,44 +124,7 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       </header>
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white section-lg">
-        <div className="max-w-7xl mx-auto container-padding">
-          <div className="text-center">
-            <div className="flex justify-center mb-8">
-              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <BookOpen className="w-10 h-10 text-white" />
-              </div>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white">
-              EduConnect
-            </h1>
-            <h2 className="text-xl md:text-2xl mb-4 max-w-4xl mx-auto font-medium text-white">
-              Empowering Quality Education for All
-            </h2>
-            <p className="text-lg mb-10 max-w-3xl mx-auto opacity-90 leading-relaxed text-white/80">
-              Supporting SDG 4: Ensure inclusive and equitable quality education and promote lifelong learning opportunities for everyone
-            </p>
-            <div className="btn-group justify-center">
-              <Link
-                to="/courses"
-                className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                Explore Courses
-              </Link>
-              {user?.role === 'teacher' && (
-                <Link
-                  to="/teacher/create-course"
-                  className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-white"
-                >
-                  Create Course
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
+      {/* Restore the rest of the dashboard as it was before the redesign */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Stats Cards */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
