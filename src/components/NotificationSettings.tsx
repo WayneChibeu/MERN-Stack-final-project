@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 const NOTIFICATION_SOUNDS = [
   {
     label: 'Chime',
-    url: 'https://cdn.pixabay.com/audio/2022/10/16/audio_12b6fae7b2.mp3',
+    url: '/audio_12b6fae7b2.mp3',
   },
   {
     label: 'Pop',
@@ -11,7 +11,7 @@ const NOTIFICATION_SOUNDS = [
   },
   {
     label: 'Bell',
-    url: 'https://cdn.pixabay.com/audio/2022/10/16/audio_12b6fae7b2.mp3',
+    url: '/audio_12b6fae7b2.mp3',
   },
 ];
 
