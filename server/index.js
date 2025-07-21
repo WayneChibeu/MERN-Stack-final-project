@@ -15,10 +15,18 @@ import { Server as SocketIOServer } from 'socket.io';
 
 dotenv.config();
 
+const FRONTEND_ORIGIN = process.env.NODE_ENV === 'production'
+  ? 'https://mern-stack-final-project.vercel.app'
+  : '*';
+
 const app = express();
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
-  cors: { origin: '*' }
+  cors: {
+    origin: FRONTEND_ORIGIN,
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
 });
 
 // Store userId <-> socketId mapping
@@ -44,7 +52,10 @@ const PORT = process.env.PORT || 3001;
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: FRONTEND_ORIGIN,
+  credentials: true
+}));
 app.use(express.json());
 
 // JWT secret
