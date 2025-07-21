@@ -567,12 +567,13 @@ const Navigation: React.FC = () => {
                   >
                     Notification Settings
                   </Link>
-                  <button
+                  <Link
+                    to="/settings"
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 focus:bg-indigo-100 focus:outline-none"
                     onClick={() => setProfileOpen(false)}
                   >
                     Settings
-                  </button>
+                  </Link>
                 <button
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 focus:bg-red-100 focus:outline-none"
                   onClick={logout}
