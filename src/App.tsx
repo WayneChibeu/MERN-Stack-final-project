@@ -15,6 +15,7 @@ import Profile from './components/Profile';
 import CreateProject from './components/CreateProject';
 import ProjectsList from './components/ProjectsList';
 import { SocketProvider } from './context/SocketContext';
+import Footer from './components/Footer';
 
 // Route protection wrappers
 const RequireAuth = ({ children }: { children: React.ReactNode }) => {
@@ -45,11 +46,11 @@ function App() {
         <ToastProvider>
           <ToastListWrapper />
           <Router>
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gray-50 flex flex-col">
               <nav role="navigation">
                 <Navigation />
               </nav>
-              <main role="main">
+              <main role="main" className="flex-grow">
                 <Routes>
                   <Route path="/" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/dashboard" element={<RequireAuth><DashboardRedirect /></RequireAuth>} />
@@ -70,6 +71,7 @@ function App() {
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </main>
+              <Footer />
             </div>
           </Router>
         </ToastProvider>
