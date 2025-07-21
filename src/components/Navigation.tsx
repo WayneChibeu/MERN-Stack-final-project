@@ -215,6 +215,10 @@ const Navigation: React.FC = () => {
     setSelectedNotifications([]);
   };
 
+  useEffect(() => {
+    setProfileOpen(false);
+  }, [user, location]);
+
   return (
     <>
       {/* Notification sound */}
