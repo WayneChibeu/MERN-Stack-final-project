@@ -1,13 +1,7 @@
 {
+  "extends": "./tsconfig.app.json",
   "compilerOptions": {
-    "esModuleInterop": true,
-    "jsx": "react-jsx",
-    "types": ["jest", "node"]
+    "types": ["jest", "@testing-library/jest-dom"]
   },
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ],
   "include": ["src", "server", "src/components/__tests__", "server/__tests__"]
 }

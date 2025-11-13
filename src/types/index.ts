@@ -26,6 +26,16 @@ export interface Course {
   updated_at: string;
 }
 
+export interface SDG {
+  id: number;
+  title: string;
+  description: string;
+  color: string;
+  icon: string;
+  targets: string[];
+  progress: number;
+}
+
 export interface Lesson {
   id: string;
   course_id: string;
@@ -75,7 +85,7 @@ export interface QuizAttempt {
   id: string;
   user_id: string;
   quiz_id: string;
-  answers: Record<string, any>;
+  answers: Record<string, unknown>;
   score: number;
   passed: boolean;
   completed_at: string;
@@ -116,4 +126,19 @@ export interface AuthContextType {
   register: (email: string, password: string, name: string, role: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
+}
+
+export interface Project {
+  id: string;
+  title: string;
+  description: string;
+  sdg_id: number;
+  creator_id: string;
+  status: 'active' | 'completed' | 'paused' | 'draft';
+  progress: number;
+  target_amount: number;
+  current_amount: number;
+  image_url?: string;
+  created_at: string;
+  updated_at: string;
 }

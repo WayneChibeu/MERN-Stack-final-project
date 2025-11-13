@@ -1,124 +1,19 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Plus, BookOpen, Users, DollarSign, TrendingUp, Eye, Edit, Trash2, MessageCircle, BarChart3 } from 'lucide-react';
+import React from 'react';
+ 
 import { useAuth } from '../context/AuthContext';
 
-const getInitials = (name) => {
+const getInitials = (name: string): string => {
   if (!name) return '';
   const parts = name.split(' ');
-  return parts.map((p) => p[0]).join('').toUpperCase();
+  return parts.map((p: string) => p[0]).join('').toUpperCase();
 };
 
-const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ setCurrentView, setSelectedCourse }) => {
+const TeacherDashboard: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
-  const navigate = useNavigate();
 
-  // Mock teacher data
-  const teacherStats = {
-    totalCourses: 8,
-    totalStudents: 2847,
-    totalRevenue: 15420,
-    averageRating: 4.8,
-    monthlyEarnings: 2340,
-    newEnrollments: 156
-  };
+  // mock courses removed (not used currently)
 
-  // Mock courses data
-  const myCourses = [
-    {
-      id: '1',
-      title: 'Digital Literacy Fundamentals',
-      students: 1234,
-      revenue: 0,
-      rating: 4.8,
-      status: 'published',
-      created: '2024-01-15',
-      lastUpdated: '2024-01-20',
-      image: 'https://images.pexels.com/photos/4144923/pexels-photo-4144923.jpeg?auto=compress&cs=tinysrgb&w=300',
-      category: 'Digital Literacy',
-      price: 0,
-      enrollments: 45,
-      completions: 892
-    },
-    {
-      id: '2',
-      title: 'Advanced Web Development',
-      students: 567,
-      revenue: 8950,
-      rating: 4.9,
-      status: 'published',
-      created: '2024-01-10',
-      lastUpdated: '2024-01-18',
-      image: 'https://images.pexels.com/photos/4144923/pexels-photo-4144923.jpeg?auto=compress&cs=tinysrgb&w=300',
-      category: 'Vocational Training',
-      price: 199,
-      enrollments: 23,
-      completions: 445
-    },
-    {
-      id: '3',
-      title: 'Mathematics for Teachers',
-      students: 892,
-      revenue: 4460,
-      rating: 4.7,
-      status: 'published',
-      created: '2024-01-05',
-      lastUpdated: '2024-01-16',
-      image: 'https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=300',
-      category: 'Primary Education',
-      price: 79,
-      enrollments: 67,
-      completions: 234
-    },
-    {
-      id: '4',
-      title: 'Environmental Education Basics',
-      students: 154,
-      revenue: 0,
-      rating: 4.6,
-      status: 'draft',
-      created: '2024-01-22',
-      lastUpdated: '2024-01-22',
-      image: 'https://images.pexels.com/photos/8926558/pexels-photo-8926558.jpeg?auto=compress&cs=tinysrgb&w=300',
-      category: 'Environmental Studies',
-      price: 0,
-      enrollments: 0,
-      completions: 0
-    }
-  ];
-
-  // Mock analytics data
-  const analyticsData = {
-    enrollmentTrend: [
-      { month: 'Jan', enrollments: 45 },
-      { month: 'Feb', enrollments: 67 },
-      { month: 'Mar', enrollments: 89 },
-      { month: 'Apr', enrollments: 123 },
-      { month: 'May', enrollments: 156 }
-    ],
-    topCourses: myCourses.slice(0, 3).map(course => ({
-      title: course.title,
-      students: course.students,
-      revenue: course.revenue
-    }))
-  };
-
-  const handleCourseAction = (action: string, courseId: string) => {
-    switch (action) {
-      case 'view':
-        navigate(`/course/${courseId}`);
-        break;
-      case 'edit':
-        // Navigate to edit course (implement as needed)
-        break;
-      case 'delete':
-        // Delete course (implement as needed)
-        break;
-      default:
-        break;
-    }
-  };
+  // analytics and handlers removed (not used currently)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-100 relative">
@@ -146,7 +41,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ setCurrentView, set
             />
           ) : (
             <div className="w-12 h-12 rounded-full bg-indigo-200 flex items-center justify-center text-xl font-bold text-indigo-700" aria-label="Your profile initials">
-              {getInitials(user?.name)}
+              {getInitials(user?.name ?? '')}
           </div>
           )}
         </div>

@@ -1,109 +1,35 @@
-import React, { useState } from 'react';
-import { Plus, Search, Filter, MapPin, Calendar, Users, DollarSign } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, Filter, Calendar, Users, DollarSign } from 'lucide-react';
 import { sdgsData } from '../data/sdgs';
 import { Project } from '../types';
-import { useToast } from '../context/ToastContext';
+import { apiFetch } from '../utils/apiFetch';
 import ContributionModal from './ContributionModal';
 import { useNavigate } from 'react-router-dom';
 
 const ProjectsList: React.FC = () => {
   const navigate = useNavigate();
-  const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSDG, setSelectedSDG] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isContributionModalOpen, setIsContributionModalOpen] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([]);
 
-  // Mock projects data
-  const mockProjects: Project[] = [
-    {
-      id: '1',
-      title: 'Clean Water Initiative - Rural Kenya',
-      description: 'Installing water purification systems in rural communities to provide access to clean drinking water.',
-      sdg_id: 6,
-      creator_id: 'user1',
-      status: 'active',
-      progress: 75,
-      target_amount: 50000,
-      current_amount: 37500,
-      image_url: 'https://images.pexels.com/photos/1738986/pexels-photo-1738986.jpeg?auto=compress&cs=tinysrgb&w=500',
-      created_at: '2024-01-15T00:00:00Z',
-      updated_at: '2024-01-20T00:00:00Z'
-    },
-    {
-      id: '2',
-      title: 'Solar Power for Schools',
-      description: 'Providing solar energy solutions to schools in underserved communities.',
-      sdg_id: 7,
-      creator_id: 'user2',
-      status: 'active',
-      progress: 45,
-      target_amount: 75000,
-      current_amount: 33750,
-      image_url: 'https://images.pexels.com/photos/9800025/pexels-photo-9800025.jpeg?auto=compress&cs=tinysrgb&w=500',
-      created_at: '2024-01-10T00:00:00Z',
-      updated_at: '2024-01-18T00:00:00Z'
-    },
-    {
-      id: '3',
-      title: 'Urban Farming Initiative',
-      description: 'Creating sustainable urban gardens to combat food insecurity in cities.',
-      sdg_id: 2,
-      creator_id: 'user3',
-      status: 'active',
-      progress: 60,
-      target_amount: 25000,
-      current_amount: 15000,
-      image_url: 'https://images.pexels.com/photos/2252602/pexels-photo-2252602.jpeg?auto=compress&cs=tinysrgb&w=500',
-      created_at: '2024-01-08T00:00:00Z',
-      updated_at: '2024-01-16T00:00:00Z'
-    },
-    {
-      id: '4',
-      title: 'Education for All - Digital Literacy',
-      description: 'Providing digital literacy training to underprivileged communities.',
-      sdg_id: 4,
-      creator_id: 'user4',
-      status: 'active',
-      progress: 30,
-      target_amount: 40000,
-      current_amount: 12000,
-      image_url: 'https://images.pexels.com/photos/1181676/pexels-photo-1181676.jpeg?auto=compress&cs=tinysrgb&w=500',
-      created_at: '2024-01-05T00:00:00Z',
-      updated_at: '2024-01-12T00:00:00Z'
-    },
-    {
-      id: '5',
-      title: 'Ocean Cleanup Project',
-      description: 'Removing plastic waste from oceans and coastal areas.',
-      sdg_id: 14,
-      creator_id: 'user5',
-      status: 'active',
-      progress: 85,
-      target_amount: 100000,
-      current_amount: 85000,
-      image_url: 'https://images.pexels.com/photos/1000366/pexels-photo-1000366.jpeg?auto=compress&cs=tinysrgb&w=500',
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-19T00:00:00Z'
-    },
-    {
-      id: '6',
-      title: 'Reforestation Campaign',
-      description: 'Planting trees to combat deforestation and climate change.',
-      sdg_id: 15,
-      creator_id: 'user6',
-      status: 'completed',
-      progress: 100,
-      target_amount: 30000,
-      current_amount: 30000,
-      image_url: 'https://images.pexels.com/photos/1072824/pexels-photo-1072824.jpeg?auto=compress&cs=tinysrgb&w=500',
-      created_at: '2023-12-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z'
-    }
-  ];
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const allProjects: Project[] = await apiFetch('/projects');
+        setProjects(allProjects);
+      } catch (error) {
+        console.error('Failed to fetch projects:', error);
+        setProjects([]);
+      }
+    };
 
-  const filteredProjects = mockProjects.filter(project => {
+    fetchProjects();
+  }, []);
+
+  const filteredProjects = projects.filter(project => {
     const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          project.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesSDG = selectedSDG === null || project.sdg_id === selectedSDG;

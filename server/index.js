@@ -7,6 +7,8 @@ import connectDB from './config/database.js';
 import User from './models/User.js';
 import Project from './models/Project.js';
 import Contribution from './models/Contribution.js';
+import Course from './models/Course.js';
+import Enrollment from './models/Enrollment.js';
 import multer from 'multer';
 import path from 'path';
 import Notification from './models/Notification.js';
@@ -15,15 +17,31 @@ import { Server as SocketIOServer } from 'socket.io';
 
 dotenv.config();
 
-const FRONTEND_ORIGIN = process.env.NODE_ENV === 'production'
+// Configure frontend origin via env or fallback to sensible defaults.
+// In production set FRONTEND_URL to your deployed frontend (e.g. https://mern-stack-final-project.vercel.app)
+const FRONTEND_URL = process.env.FRONTEND_URL || (process.env.NODE_ENV === 'production'
   ? 'https://mern-stack-final-project.vercel.app'
-  : '*';
+  : 'http://localhost:5173');
 
 const app = express();
 const server = http.createServer(app);
+
+// Central CORS options used for both Express and Socket.IO
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    if (origin === FRONTEND_URL) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
 const io = new SocketIOServer(server, {
   cors: {
-    origin: FRONTEND_ORIGIN,
+    origin: FRONTEND_URL,
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -52,10 +70,9 @@ const PORT = process.env.PORT || 3001;
 connectDB();
 
 // Middleware
-app.use(cors({
-  origin: FRONTEND_ORIGIN,
-  credentials: true
-}));
+// Use CORS for all routes and explicitly handle preflight requests
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 // JWT secret
@@ -373,6 +390,219 @@ app.get('/api/projects/:id/contributions', async (req, res) => {
       .sort({ createdAt: -1 });
 
     res.json(contributions);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Course routes
+app.get('/api/courses', async (req, res) => {
+  try {
+    const { category, subject, level, search, sortBy } = req.query;
+    let query = {};
+
+    if (category && category !== 'all') query.category = category;
+    if (subject && subject !== 'all') query.subject = subject;
+    if (level && level !== 'all') query.level = level;
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    let sortOptions = { createdAt: -1 };
+    if (sortBy === 'popular') sortOptions = { students_count: -1 };
+    if (sortBy === 'rating') sortOptions = { rating: -1 };
+    if (sortBy === 'newest') sortOptions = { createdAt: -1 };
+
+    const courses = await Course.find(query)
+      .populate('instructor_id', 'name email avatar')
+      .sort(sortOptions);
+
+    res.json(courses);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/courses/:id', async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id)
+      .populate('instructor_id', 'name email avatar');
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    res.json(course);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/courses', authenticateToken, async (req, res) => {
+  try {
+    const { title, description, category, subject, level, duration, price, image_url, lessons, certificate } = req.body;
+
+    const course = new Course({
+      title,
+      description,
+      instructor_id: req.user.userId,
+      category,
+      subject,
+      level,
+      duration,
+      price,
+      image_url,
+      lessons,
+      certificate
+    });
+
+    await course.save();
+    await course.populate('instructor_id', 'name email avatar');
+
+    res.json(course);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/courses/:id', authenticateToken, async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    if (course.instructor_id.toString() !== req.user.userId) {
+      return res.status(403).json({ error: 'Not authorized to update this course' });
+    }
+
+    const updatedCourse = await Course.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    ).populate('instructor_id', 'name email avatar');
+
+    res.json(updatedCourse);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/courses/:id', authenticateToken, async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    if (course.instructor_id.toString() !== req.user.userId) {
+      return res.status(403).json({ error: 'Not authorized to delete this course' });
+    }
+
+    await Course.findByIdAndDelete(req.params.id);
+    await Enrollment.deleteMany({ course_id: req.params.id });
+
+    res.json({ message: 'Course deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Enrollment routes
+app.post('/api/enroll', authenticateToken, async (req, res) => {
+  try {
+    const { course_id } = req.body;
+
+    const course = await Course.findById(course_id);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    // Check if already enrolled
+    const existing = await Enrollment.findOne({ user_id: req.user.userId, course_id });
+    if (existing) {
+      return res.status(400).json({ error: 'Already enrolled in this course' });
+    }
+
+    const enrollment = new Enrollment({
+      user_id: req.user.userId,
+      course_id,
+      total_lessons: course.lessons
+    });
+
+    await enrollment.save();
+
+    // Increment student count
+    await Course.findByIdAndUpdate(course_id, { $inc: { students_count: 1 } });
+
+    await enrollment.populate([
+      { path: 'user_id', select: 'name email' },
+      { path: 'course_id', select: 'title description' }
+    ]);
+
+    res.json(enrollment);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/user/enrolled-courses', authenticateToken, async (req, res) => {
+  try {
+    const enrollments = await Enrollment.find({ user_id: req.user.userId })
+      .populate('course_id')
+      .sort({ enrollment_date: -1 });
+
+    res.json(enrollments);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/courses/:id/enrollments', async (req, res) => {
+  try {
+    const enrollments = await Enrollment.find({ course_id: req.params.id })
+      .populate('user_id', 'name email')
+      .sort({ enrollment_date: -1 });
+
+    res.json(enrollments);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/enrollments/:id', authenticateToken, async (req, res) => {
+  try {
+    const { progress, completed_lessons, time_spent, grade, status } = req.body;
+
+    const enrollment = await Enrollment.findById(req.params.id);
+    if (!enrollment) {
+      return res.status(404).json({ error: 'Enrollment not found' });
+    }
+
+    if (enrollment.user_id.toString() !== req.user.userId) {
+      return res.status(403).json({ error: 'Not authorized to update this enrollment' });
+    }
+
+    const updatedEnrollment = await Enrollment.findByIdAndUpdate(
+      req.params.id,
+      {
+        progress,
+        completed_lessons,
+        time_spent,
+        grade,
+        status,
+        last_accessed: new Date(),
+        updatedAt: new Date()
+      },
+      { new: true }
+    ).populate('course_id');
+
+    res.json(updatedEnrollment);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -58,8 +58,10 @@ const ContributionModal: React.FC<ContributionModalProps> = ({ project, isOpen, 
         onClose();
       }
     }
-    modalRef.current.addEventListener('keydown', handleKeyDown);
-    return () => modalRef.current?.removeEventListener('keydown', handleKeyDown);
+    const modalEl = modalRef.current;
+    if (!modalEl) return undefined;
+    modalEl.addEventListener('keydown', handleKeyDown);
+    return () => modalEl.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {

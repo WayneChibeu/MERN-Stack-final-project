@@ -6,6 +6,7 @@ import { renderWithProviders } from './test-utils';
 describe('Footer', () => {
   it('renders EduConnect brand', () => {
     renderWithProviders(<Footer />);
-    expect(screen.getByText(/EduConnect/i)).toBeInTheDocument();
+    // Use heading role to avoid matching the copyright text as well
+    expect(screen.getByRole('heading', { name: /EduConnect/i })).toBeInTheDocument();
   });
 }); 

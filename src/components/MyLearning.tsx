@@ -1,125 +1,73 @@
-import React, { useState } from 'react';
-import { BookOpen, Clock, Award, TrendingUp, Play, CheckCircle, BarChart3 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { BookOpen, Clock, Award, Play, CheckCircle, TrendingUp } from 'lucide-react';
+import { apiFetch } from '../utils/apiFetch';
 
 interface MyLearningProps {
   setCurrentView: (view: string) => void;
   setSelectedCourse: (courseId: string) => void;
 }
 
+interface EnrolledCourse {
+  _id: string;
+  user_id: string;
+  course_id: {
+    _id: string;
+    title: string;
+    instructor_id: { name: string };
+    image_url: string;
+    category: string;
+    lessons: number;
+    duration: number;
+  };
+  progress: number;
+  completed_lessons: number;
+  total_lessons: number;
+  time_spent: number;
+  status: string;
+  enrollment_date: string;
+  grade?: number;
+  completion_date?: string;
+}
+
 const MyLearning: React.FC<MyLearningProps> = ({ setCurrentView, setSelectedCourse }) => {
-  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('enrolled');
+  const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourse[]>([]);
+  const [completedCourses, setCompletedCourses] = useState<EnrolledCourse[]>([]);
 
-  // Mock enrolled courses data
-  const enrolledCourses = [
-    {
-      id: '1',
-      title: 'Digital Literacy Fundamentals',
-      instructor: 'Dr. Sarah Johnson',
-      progress: 75,
-      totalLessons: 12,
-      completedLessons: 9,
-      timeSpent: 28,
-      totalTime: 40,
-      image: 'https://images.pexels.com/photos/4144923/pexels-photo-4144923.jpeg?auto=compress&cs=tinysrgb&w=300',
-      category: 'Digital Literacy',
-      lastAccessed: '2024-01-20',
-      nextLesson: 'Internet Safety and Security'
-    },
-    {
-      id: '2',
-      title: 'Mathematics for Primary Education',
-      instructor: 'Prof. Michael Chen',
-      progress: 45,
-      totalLessons: 18,
-      completedLessons: 8,
-      timeSpent: 22,
-      totalTime: 60,
-      image: 'https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=300',
-      category: 'Primary Education',
-      lastAccessed: '2024-01-18',
-      nextLesson: 'Fractions and Decimals'
-    },
-    {
-      id: '3',
-      title: 'Environmental Science & Sustainability',
-      instructor: 'Dr. Amara Okafor',
-      progress: 90,
-      totalLessons: 10,
-      completedLessons: 9,
-      timeSpent: 32,
-      totalTime: 35,
-      image: 'https://images.pexels.com/photos/8926558/pexels-photo-8926558.jpeg?auto=compress&cs=tinysrgb&w=300',
-      category: 'Environmental Studies',
-      lastAccessed: '2024-01-19',
-      nextLesson: 'Final Assessment'
-    }
-  ];
+  useEffect(() => {
+    const fetchEnrollments = async () => {
+      try {
+        const enrollments: EnrolledCourse[] = await apiFetch('/user/enrolled-courses');
+        
+        // Separate enrolled and completed
+        const enrolled = enrollments.filter(e => e.status === 'enrolled' || e.status === 'in-progress');
+        const completed = enrollments.filter(e => e.status === 'completed');
+        
+        setEnrolledCourses(enrolled);
+        setCompletedCourses(completed);
+      } catch (error) {
+        console.error('Failed to fetch enrollments:', error);
+        setEnrolledCourses([]);
+        setCompletedCourses([]);
+      }
+    };
 
-  // Mock completed courses data
-  const completedCourses = [
-    {
-      id: '4',
-      title: 'Adult Literacy Program',
-      instructor: 'Maria Rodriguez',
-      completedDate: '2024-01-10',
-      grade: 95,
-      timeSpent: 45,
-      image: 'https://images.pexels.com/photos/4144923/pexels-photo-4144923.jpeg?auto=compress&cs=tinysrgb&w=300',
-      category: 'Adult Learning',
-      certificateId: 'CERT-2024-001'
-    },
-    {
-      id: '5',
-      title: 'Financial Literacy for Everyone',
-      instructor: 'Dr. Lisa Park',
-      completedDate: '2023-12-15',
-      grade: 88,
-      timeSpent: 25,
-      image: 'https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=300',
-      category: 'Life Skills',
-      certificateId: 'CERT-2023-045'
-    }
-  ];
-
-  // Mock certificates data
-  const certificates = [
-    {
-      id: 'CERT-2024-001',
-      courseTitle: 'Adult Literacy Program',
-      issuedDate: '2024-01-10',
-      instructor: 'Maria Rodriguez',
-      grade: 95
-    },
-    {
-      id: 'CERT-2023-045',
-      courseTitle: 'Financial Literacy for Everyone',
-      issuedDate: '2023-12-15',
-      instructor: 'Dr. Lisa Park',
-      grade: 88
-    }
-  ];
+    fetchEnrollments();
+  }, []);
 
   // Learning statistics
   const stats = {
     totalCourses: enrolledCourses.length + completedCourses.length,
     completedCourses: completedCourses.length,
-    totalHours: enrolledCourses.reduce((sum, course) => sum + course.timeSpent, 0) + 
-                completedCourses.reduce((sum, course) => sum + course.timeSpent, 0),
-    certificates: certificates.length,
-    averageProgress: Math.round(enrolledCourses.reduce((sum, course) => sum + course.progress, 0) / enrolledCourses.length)
+    totalHours: enrolledCourses.reduce((sum, course) => sum + (course.time_spent || 0), 0) / 60 + 
+                completedCourses.reduce((sum, course) => sum + (course.time_spent || 0), 0) / 60,
+    certificates: completedCourses.length,
+    averageProgress: enrolledCourses.length > 0 ? Math.round(enrolledCourses.reduce((sum, course) => sum + course.progress, 0) / enrolledCourses.length) : 0
   };
 
   const handleCourseClick = (courseId: string) => {
     setSelectedCourse(courseId);
     setCurrentView('course-detail');
-  };
-
-  const downloadCertificate = (certificateId: string) => {
-    // Mock certificate download
-    console.log('Downloading certificate:', certificateId);
-    // In real app, this would generate and download a PDF certificate
   };
 
   return (
@@ -159,7 +107,7 @@ const MyLearning: React.FC<MyLearningProps> = ({ setCurrentView, setSelectedCour
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Learning Hours</p>
-                <p className="text-3xl font-bold text-purple-600">{stats.totalHours}</p>
+                <p className="text-3xl font-bold text-purple-600">{Math.round(stats.totalHours)}</p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
                 <Clock className="w-6 h-6 text-purple-600" />
@@ -189,30 +137,30 @@ const MyLearning: React.FC<MyLearningProps> = ({ setCurrentView, setSelectedCour
             </div>
           </div>
           <div className="space-y-4">
-            {enrolledCourses.map((course) => (
-              <div key={course.id} className="flex items-center space-x-4">
+            {enrolledCourses.map((enrollment) => (
+              <div key={enrollment._id} className="flex items-center space-x-4">
                 <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                   <img
-                    src={course.image}
-                    alt={course.title}
+                    src={enrollment.course_id?.image_url || 'https://via.placeholder.com/64'}
+                    alt={enrollment.course_id?.title}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-medium text-gray-900">{course.title}</h3>
+                  <h3 className="font-medium text-gray-900">{enrollment.course_id?.title}</h3>
                   <div className="flex items-center space-x-4 text-sm text-gray-500 mb-2">
-                    <span>{course.completedLessons}/{course.totalLessons} lessons</span>
-                    <span>{course.timeSpent}/{course.totalTime} hours</span>
+                    <span>{enrollment.completed_lessons}/{enrollment.total_lessons} lessons</span>
+                    <span>{Math.round(enrollment.time_spent / 60)} hours</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="h-2 rounded-full bg-blue-600 transition-all duration-300"
-                      style={{ width: `${course.progress}%` }}
+                      style={{ width: `${enrollment.progress}%` }}
                     />
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-gray-900">{course.progress}%</div>
+                  <div className="text-2xl font-bold text-gray-900">{enrollment.progress}%</div>
                   <div className="text-sm text-gray-500">Complete</div>
                 </div>
               </div>
@@ -227,7 +175,7 @@ const MyLearning: React.FC<MyLearningProps> = ({ setCurrentView, setSelectedCour
               {[
                 { id: 'enrolled', label: 'Enrolled Courses', count: enrolledCourses.length },
                 { id: 'completed', label: 'Completed', count: completedCourses.length },
-                { id: 'certificates', label: 'Certificates', count: certificates.length }
+                { id: 'certificates', label: 'Certificates', count: completedCourses.length }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -251,63 +199,64 @@ const MyLearning: React.FC<MyLearningProps> = ({ setCurrentView, setSelectedCour
             {/* Enrolled Courses Tab */}
             {activeTab === 'enrolled' && (
               <div className="space-y-6">
-                {enrolledCourses.map((course) => (
-                  <div key={course.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                        <img
-                          src={course.image}
-                          alt={course.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-1">{course.title}</h3>
-                            <p className="text-gray-600">by {course.instructor}</p>
-                          </div>
-                          <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-                            {course.category}
-                          </span>
+                {enrolledCourses.length > 0 ? (
+                  enrolledCourses.map((enrollment) => (
+                    <div key={enrollment._id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                      <div className="flex items-start space-x-4">
+                        <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                          <img
+                            src={enrollment.course_id?.image_url || 'https://via.placeholder.com/80'}
+                            alt={enrollment.course_id?.title}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                          <div className="text-sm">
-                            <span className="text-gray-500">Progress:</span>
-                            <div className="flex items-center space-x-2 mt-1">
-                              <div className="flex-1 bg-gray-200 rounded-full h-2">
-                                <div
-                                  className="h-2 rounded-full bg-blue-600"
-                                  style={{ width: `${course.progress}%` }}
-                                />
-                              </div>
-                              <span className="font-medium text-gray-900">{course.progress}%</span>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between mb-2">
+                            <div>
+                              <h3 className="text-xl font-bold text-gray-900 mb-1">{enrollment.course_id?.title}</h3>
+                              <p className="text-gray-600">by {enrollment.course_id?.instructor_id?.name}</p>
                             </div>
+                            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                              {enrollment.course_id?.category}
+                            </span>
                           </div>
-                          <div className="text-sm">
-                            <span className="text-gray-500">Lessons:</span>
-                            <p className="font-medium text-gray-900">
-                              {course.completedLessons}/{course.totalLessons} completed
-                            </p>
-                          </div>
-                          <div className="text-sm">
-                            <span className="text-gray-500">Time spent:</span>
-                            <p className="font-medium text-gray-900">
-                              {course.timeSpent}/{course.totalTime} hours
-                            </p>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div className="text-sm">
+                              <span className="text-gray-500">Progress:</span>
+                              <div className="flex items-center space-x-2 mt-1">
+                                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                  <div
+                                    className="h-2 rounded-full bg-blue-600"
+                                    style={{ width: `${enrollment.progress}%` }}
+                                  />
+                                </div>
+                                <span className="font-medium text-gray-900">{enrollment.progress}%</span>
+                              </div>
+                            </div>
+                            <div className="text-sm">
+                              <span className="text-gray-500">Lessons:</span>
+                              <p className="font-medium text-gray-900">
+                                {enrollment.completed_lessons}/{enrollment.total_lessons} completed
+                              </p>
+                            </div>
+                            <div className="text-sm">
+                              <span className="text-gray-500">Time spent:</span>
+                              <p className="font-medium text-gray-900">
+                                {Math.round(enrollment.time_spent / 60)} hours
+                              </p>
+                            </div>
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between">
                           <div className="text-sm text-gray-500">
-                            <span>Next: {course.nextLesson}</span>
                             <span className="mx-2">•</span>
-                            <span>Last accessed: {course.lastAccessed}</span>
+                            <span>Last accessed: {new Date(enrollment.enrollment_date).toLocaleDateString()}</span>
                           </div>
                           <div className="flex space-x-3">
                             <button
-                              onClick={() => handleCourseClick(course.id)}
+                              onClick={() => handleCourseClick(enrollment.course_id?._id)}
                               className="text-blue-600 hover:text-blue-700 font-medium text-sm"
                             >
                               View Course
@@ -320,65 +269,71 @@ const MyLearning: React.FC<MyLearningProps> = ({ setCurrentView, setSelectedCour
                         </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-600">No enrolled courses</h3>
+                    <p className="text-gray-500">Start learning by exploring our course catalog</p>
                   </div>
-                ))}
+                )}
               </div>
             )}
 
             {/* Completed Courses Tab */}
             {activeTab === 'completed' && (
               <div className="space-y-6">
-                {completedCourses.map((course) => (
-                  <div key={course.id} className="border border-gray-200 rounded-lg p-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                        <img
-                          src={course.image}
-                          alt={course.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-1">{course.title}</h3>
-                            <p className="text-gray-600">by {course.instructor}</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <CheckCircle className="w-5 h-5 text-green-500" />
-                            <span className="text-green-600 font-medium">Completed</span>
-                          </div>
+                {completedCourses.length > 0 ? (
+                  completedCourses.map((enrollment) => (
+                    <div key={enrollment._id} className="border border-gray-200 rounded-lg p-6">
+                      <div className="flex items-start space-x-4">
+                        <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                          <img
+                            src={enrollment.course_id?.image_url || 'https://via.placeholder.com/80'}
+                            alt={enrollment.course_id?.title}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                          <div className="text-sm">
-                            <span className="text-gray-500">Completed:</span>
-                            <p className="font-medium text-gray-900">{course.completedDate}</p>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between mb-2">
+                            <div>
+                              <h3 className="text-xl font-bold text-gray-900 mb-1">{enrollment.course_id?.title}</h3>
+                              <p className="text-gray-600">by {enrollment.course_id?.instructor_id?.name}</p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <CheckCircle className="w-5 h-5 text-green-500" />
+                              <span className="text-green-600 font-medium">Completed</span>
+                            </div>
                           </div>
-                          <div className="text-sm">
-                            <span className="text-gray-500">Final Grade:</span>
-                            <p className="font-medium text-gray-900">{course.grade}%</p>
-                          </div>
-                          <div className="text-sm">
-                            <span className="text-gray-500">Time spent:</span>
-                            <p className="font-medium text-gray-900">{course.timeSpent} hours</p>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div className="text-sm">
+                              <span className="text-gray-500">Completed:</span>
+                              <p className="font-medium text-gray-900">{new Date(enrollment.completion_date || '').toLocaleDateString()}</p>
+                            </div>
+                            <div className="text-sm">
+                              <span className="text-gray-500">Final Grade:</span>
+                              <p className="font-medium text-gray-900">{enrollment.grade}%</p>
+                            </div>
+                            <div className="text-sm">
+                              <span className="text-gray-500">Time spent:</span>
+                            <p className="font-medium text-gray-900">{Math.round(enrollment.time_spent / 60)} hours</p>
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between">
                           <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                            {course.category}
+                            {enrollment.course_id?.category}
                           </span>
                           <div className="flex space-x-3">
                             <button
-                              onClick={() => downloadCertificate(course.certificateId)}
                               className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium"
                             >
                               <Award className="w-4 h-4" />
-                              <span>Download Certificate</span>
+                              <span>View Certificate</span>
                             </button>
                             <button
-                              onClick={() => handleCourseClick(course.id)}
+                              onClick={() => handleCourseClick(enrollment.course_id?._id)}
                               className="text-gray-600 hover:text-gray-700 font-medium"
                             >
                               Review Course
@@ -387,36 +342,49 @@ const MyLearning: React.FC<MyLearningProps> = ({ setCurrentView, setSelectedCour
                         </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <CheckCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-600">No completed courses yet</h3>
+                    <p className="text-gray-500">Complete a course to earn your certificate</p>
                   </div>
-                ))}
+                )}
               </div>
             )}
 
             {/* Certificates Tab */}
             {activeTab === 'certificates' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {certificates.map((cert) => (
-                  <div key={cert.id} className="border border-gray-200 rounded-lg p-6 bg-gradient-to-br from-blue-50 to-indigo-50">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                        <Award className="w-6 h-6 text-white" />
+                {completedCourses.length > 0 ? (
+                  completedCourses.map((enrollment) => (
+                    <div key={enrollment._id} className="border border-gray-200 rounded-lg p-6 bg-gradient-to-br from-blue-50 to-indigo-50">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                          <Award className="w-6 h-6 text-white" />
+                        </div>
+                        <span className="text-xs text-gray-500">#{enrollment._id}</span>
                       </div>
-                      <span className="text-xs text-gray-500">#{cert.id}</span>
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">{enrollment.course_id?.title}</h3>
+                      <div className="space-y-2 text-sm text-gray-600 mb-4">
+                        <p><span className="font-medium">Instructor:</span> {enrollment.course_id?.instructor_id?.name}</p>
+                        <p><span className="font-medium">Issued:</span> {new Date(enrollment.completion_date || '').toLocaleDateString()}</p>
+                        <p><span className="font-medium">Grade:</span> {enrollment.grade}%</p>
+                      </div>
+                      <button
+                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                      >
+                        View Certificate
+                      </button>
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">{cert.courseTitle}</h3>
-                    <div className="space-y-2 text-sm text-gray-600 mb-4">
-                      <p><span className="font-medium">Instructor:</span> {cert.instructor}</p>
-                      <p><span className="font-medium">Issued:</span> {cert.issuedDate}</p>
-                      <p><span className="font-medium">Grade:</span> {cert.grade}%</p>
-                    </div>
-                    <button
-                      onClick={() => downloadCertificate(cert.id)}
-                      className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                    >
-                      Download Certificate
-                    </button>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-12">
+                    <Award className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-600">No certificates earned yet</h3>
+                    <p className="text-gray-500">Complete courses to earn certificates</p>
                   </div>
-                ))}
+                )}
               </div>
             )}
           </div>

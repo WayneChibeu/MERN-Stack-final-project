@@ -1,8 +1,8 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
-
-const SOCKET_URL = import.meta.env.VITE_API_URL?.replace(/^http/, 'ws') || window.location.origin;
+import { SOCKET_URL } from '../config/api';
 
 interface SocketContextType {
   socket: Socket | null;

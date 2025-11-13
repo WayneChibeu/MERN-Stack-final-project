@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Play, Clock, Users, Star, BookOpen, Award, MessageCircle, DollarSign, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Play, Clock, Users, Star, BookOpen, Award, MessageCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
@@ -146,7 +146,8 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
       setEnrolled(true);
       // Here you would call your enrollment API
       showToast('Enrolled in course successfully!', 'success');
-    } catch (error) {
+    } catch (err) {
+      console.error(err);
       showToast('Error enrolling in course. Please try again.', 'error');
     }
   };

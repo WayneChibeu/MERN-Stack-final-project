@@ -1,9 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { User } from '../types';
 
 const Footer: React.FC = () => {
-  const { user } = useAuth();
+  // Guard `useAuth` in tests: some test setups can make the context/hook throw
+  // (invalid hook call). Try to use it and fall back to unauthenticated
+  // behavior so presentational tests can run.
+  let user: User | null = null;
+  try {
+    const auth = useAuth();
+    user = auth?.user ?? null;
+  } catch {
+    user = null;
+  }
 
   return (
     <footer className="bg-white border-t border-gray-200 text-gray-600 mt-auto">

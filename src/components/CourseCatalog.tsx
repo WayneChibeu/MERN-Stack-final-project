@@ -1,11 +1,30 @@
-import React, { useState } from 'react';
-import { Search, Filter, BookOpen, Users, Clock, Star, Play } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, BookOpen, Users, Clock, Star, Play } from 'lucide-react';
 import { educationCategories, courseSubjects } from '../data/sdg4';
 import SkeletonCourseCard from './SkeletonCourseCard';
+import { apiFetch } from '../utils/apiFetch';
 
 interface CourseCatalogProps {
   setCurrentView: (view: string) => void;
   setSelectedCourse: (courseId: string) => void;
+}
+
+interface Course {
+  _id: string;
+  id?: string;
+  title: string;
+  description: string;
+  instructor_id: { name: string; email: string; avatar?: string };
+  category: string;
+  subject: string;
+  level: string;
+  duration: number;
+  price: number;
+  rating: number;
+  students_count: number;
+  image_url: string;
+  lessons: number;
+  certificate: boolean;
 }
 
 const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelectedCourse }) => {
@@ -15,146 +34,32 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
   const [selectedLevel, setSelectedLevel] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('popular');
   const [loading, setLoading] = useState(true);
+  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
 
-  // Mock courses data
-  const mockCourses = [
-    {
-      id: '1',
-      title: 'Digital Literacy Fundamentals',
-      description: 'Learn essential digital skills for the modern world including computer basics, internet safety, and digital communication.',
-      instructor: 'Dr. Sarah Johnson',
-      instructor_avatar: 'https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=100',
-      category: 'digital',
-      subject: 'Technology',
-      level: 'beginner',
-      duration: 40,
-      price: 0,
-      rating: 4.8,
-      students: 1234,
-      image: 'https://images.pexels.com/photos/4144923/pexels-photo-4144923.jpeg?auto=compress&cs=tinysrgb&w=500',
-      lessons: 12,
-      certificate: true
-    },
-    {
-      id: '2',
-      title: 'Mathematics for Primary Education',
-      description: 'Comprehensive mathematics curriculum designed for primary school students covering arithmetic, geometry, and problem-solving.',
-      instructor: 'Prof. Michael Chen',
-      instructor_avatar: 'https://images.pexels.com/photos/3777943/pexels-photo-3777943.jpeg?auto=compress&cs=tinysrgb&w=100',
-      category: 'primary',
-      subject: 'Mathematics',
-      level: 'beginner',
-      duration: 60,
-      price: 49,
-      rating: 4.9,
-      students: 892,
-      image: 'https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=500',
-      lessons: 18,
-      certificate: true
-    },
-    {
-      id: '3',
-      title: 'Environmental Science & Sustainability',
-      description: 'Explore environmental challenges and sustainable solutions while learning about climate change, conservation, and green technologies.',
-      instructor: 'Dr. Amara Okafor',
-      instructor_avatar: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=100',
-      category: 'secondary',
-      subject: 'Environmental Studies',
-      level: 'intermediate',
-      duration: 35,
-      price: 79,
-      rating: 4.7,
-      students: 567,
-      image: 'https://images.pexels.com/photos/8926558/pexels-photo-8926558.jpeg?auto=compress&cs=tinysrgb&w=500',
-      lessons: 10,
-      certificate: true
-    },
-    {
-      id: '4',
-      title: 'Adult Literacy Program',
-      description: 'Comprehensive reading and writing program designed for adult learners to develop essential literacy skills.',
-      instructor: 'Maria Rodriguez',
-      instructor_avatar: 'https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=100',
-      category: 'adult',
-      subject: 'Language Arts',
-      level: 'beginner',
-      duration: 50,
-      price: 0,
-      rating: 4.6,
-      students: 2341,
-      image: 'https://images.pexels.com/photos/4144923/pexels-photo-4144923.jpeg?auto=compress&cs=tinysrgb&w=500',
-      lessons: 15,
-      certificate: true
-    },
-    {
-      id: '5',
-      title: 'Vocational Skills: Web Development',
-      description: 'Learn practical web development skills including HTML, CSS, and JavaScript to start your career in tech.',
-      instructor: 'James Wilson',
-      instructor_avatar: 'https://images.pexels.com/photos/3777943/pexels-photo-3777943.jpeg?auto=compress&cs=tinysrgb&w=100',
-      category: 'vocational',
-      subject: 'Technology',
-      level: 'intermediate',
-      duration: 120,
-      price: 199,
-      rating: 4.8,
-      students: 445,
-      image: 'https://images.pexels.com/photos/4144923/pexels-photo-4144923.jpeg?auto=compress&cs=tinysrgb&w=500',
-      lessons: 24,
-      certificate: true
-    },
-    {
-      id: '6',
-      title: 'Financial Literacy for Everyone',
-      description: 'Essential financial skills including budgeting, saving, investing, and understanding credit and loans.',
-      instructor: 'Dr. Lisa Park',
-      instructor_avatar: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=100',
-      category: 'adult',
-      subject: 'Financial Literacy',
-      level: 'beginner',
-      duration: 25,
-      price: 39,
-      rating: 4.5,
-      students: 1876,
-      image: 'https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=500',
-      lessons: 8,
-      certificate: true
-    }
-  ];
+  // Fetch courses from API
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const query = new URLSearchParams();
+        if (selectedCategory !== 'all') query.append('category', selectedCategory);
+        if (selectedSubject !== 'all') query.append('subject', selectedSubject);
+        if (selectedLevel !== 'all') query.append('level', selectedLevel);
+        if (searchTerm) query.append('search', searchTerm);
+        query.append('sortBy', sortBy);
 
-  React.useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 1500);
-    return () => clearTimeout(timer);
+        const data: Course[] = await apiFetch(`/courses?${query.toString()}`);
+        setFilteredCourses(data);
+      } catch (error) {
+        console.error('Failed to fetch courses:', error);
+        setFilteredCourses([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
   }, [searchTerm, selectedCategory, selectedSubject, selectedLevel, sortBy]);
-
-  const filteredCourses = mockCourses.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.instructor.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || course.category === selectedCategory;
-    const matchesSubject = selectedSubject === 'all' || course.subject === selectedSubject;
-    const matchesLevel = selectedLevel === 'all' || course.level === selectedLevel;
-    
-    return matchesSearch && matchesCategory && matchesSubject && matchesLevel;
-  });
-
-  const sortedCourses = [...filteredCourses].sort((a, b) => {
-    switch (sortBy) {
-      case 'popular':
-        return b.students - a.students;
-      case 'rating':
-        return b.rating - a.rating;
-      case 'newest':
-        return new Date(b.id).getTime() - new Date(a.id).getTime();
-      case 'price-low':
-        return a.price - b.price;
-      case 'price-high':
-        return b.price - a.price;
-      default:
-        return 0;
-    }
-  });
 
   const getCategoryData = (categoryId: string) => {
     return educationCategories.find(cat => cat.id === categoryId);
@@ -248,7 +153,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
         {/* Results Summary */}
         <div className="mb-6">
           <p className="text-gray-600 leading-relaxed">
-            Showing {sortedCourses.length} of {mockCourses.length} courses
+            Showing {filteredCourses.length} courses
           </p>
         </div>
 
@@ -258,18 +163,18 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
             Array.from({ length: 6 }).map((_, idx) => (
               <SkeletonCourseCard key={idx} />
             ))
-          ) : (
-            sortedCourses.map(course => {
+          ) : filteredCourses.length > 0 ? (
+            filteredCourses.map(course => {
             const categoryData = getCategoryData(course.category);
             return (
               <div 
-                key={course.id} 
+                key={course._id || course.id} 
                   className="card overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
-                onClick={() => handleCourseClick(course.id)}
+                onClick={() => handleCourseClick(course._id || course.id || '')}
               >
                 <div className="relative">
                   <img
-                    src={course.image}
+                    src={course.image_url || 'https://via.placeholder.com/500x300'}
                     alt={course.title}
                     className="w-full h-48 object-cover"
                   />
@@ -308,18 +213,18 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
                   
                   <div className="flex items-center space-x-2 mb-4">
                     <img
-                      src={course.instructor_avatar}
-                      alt={course.instructor}
+                      src={course.instructor_id?.avatar || 'https://via.placeholder.com/32'}
+                      alt={course.instructor_id?.name || 'Instructor'}
                       className="w-8 h-8 rounded-full object-cover"
                     />
-                    <span className="text-sm text-gray-700">{course.instructor}</span>
+                    <span className="text-sm text-gray-700">{course.instructor_id?.name || 'Unknown Instructor'}</span>
                   </div>
 
                     <div className="flex items-center justify-between text-small text-gray-500 mb-4">
                     <div className="flex items-center space-x-4">
                       <div className="flex items-center space-x-1">
                         <Users className="w-4 h-4" />
-                        <span>{course.students.toLocaleString()}</span>
+                        <span>{(course.students_count || 0).toLocaleString()}</span>
                       </div>
                       <div className="flex items-center space-x-1">
                         <Clock className="w-4 h-4" />
@@ -336,7 +241,7 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
                     <div className="flex items-center space-x-1">
                       <Star className="w-4 h-4 text-yellow-400 fill-current" />
                       <span className="font-medium text-gray-900">{course.rating}</span>
-                        <span className="text-small text-gray-500">({course.students})</span>
+                        <span className="text-small text-gray-500">({course.students_count})</span>
                     </div>
                     {course.certificate && (
                       <div className="flex items-center space-x-1 text-green-600">
@@ -349,10 +254,18 @@ const CourseCatalog: React.FC<CourseCatalogProps> = ({ setCurrentView, setSelect
               </div>
             );
             })
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No courses found</h3>
+              <p className="text-gray-600">Try adjusting your filters or search term</p>
+            </div>
           )}
         </div>
 
-        {sortedCourses.length === 0 && (
+        {filteredCourses.length === 0 && !loading && (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Search className="w-8 h-8 text-gray-400" />

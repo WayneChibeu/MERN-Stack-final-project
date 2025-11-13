@@ -9,13 +9,9 @@ afterEach(() => {
   cleanup();
 });
 
-// Mock Vite's import.meta.env for tests
-if (!('import' in globalThis)) {
-  (globalThis as any).import = {};
-}
-(globalThis as any).import.meta = {
-  env: {
-    VITE_API_URL: 'http://localhost:3001/api',
-    MODE: 'test'
-  }
-}; 
+// If tests need environment variables, prefer using process.env or configure them
+// via the test runner (vitest config). Avoid mutating import.meta here because
+// it can interfere with ESM/module runtime and React's internals.
+
+// No need to mock AuthContext - the real one has built-in test fallbacks
+// See AuthContext.tsx for the IS_TEST logic

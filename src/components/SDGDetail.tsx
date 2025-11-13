@@ -13,6 +13,7 @@ const SDGDetail: React.FC<SDGDetailProps> = ({ sdgId, setCurrentView }) => {
   
   if (!sdg) return null;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const IconComponent = LucideIcons[sdg.icon as keyof typeof LucideIcons] as React.ComponentType<any>;
 
   return (
@@ -32,7 +33,7 @@ const SDGDetail: React.FC<SDGDetailProps> = ({ sdgId, setCurrentView }) => {
               className="w-16 h-16 rounded-full flex items-center justify-center text-white"
               style={{ backgroundColor: sdg.color }}
             >
-              {IconComponent && <IconComponent className="w-8 h-8" />}
+                          <IconComponent className="w-12 h-12 text-white" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{sdg.title}</h1>

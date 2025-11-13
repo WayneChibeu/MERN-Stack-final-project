@@ -1,22 +1,16 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { User, Mail, Calendar, Award, BookOpen, Edit, Save, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from './ui/Button';
-import axios from 'axios';
 
-const getInitials = (name) => {
-  if (!name) return '';
-  const parts = name.split(' ');
-  return parts.map((p) => p[0]).join('').toUpperCase();
-};
 
 interface ProfileProps {
   setCurrentView: (view: string) => void;
 }
 
 const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
-  const { user, setUser } = useAuth();
+  const { user } = useAuth();
   const { showToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -29,8 +23,6 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
     twitter: ''
   });
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar || '');
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef(null);
 
   const handleSave = () => {
     try {
@@ -38,7 +30,8 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
       console.log('Saving profile:', formData);
       setIsEditing(false);
       showToast('Profile updated successfully!', 'success');
-    } catch (error) {
+    } catch (err) {
+      console.error(err);
       showToast('Error updating profile. Please try again.', 'error');
     }
   };
@@ -54,30 +47,11 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
       twitter: ''
     });
     setIsEditing(false);
+    // reset avatar preview to user's current avatar
+    setAvatarPreview(user?.avatar || '');
   };
 
-  const handleAvatarChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setAvatarPreview(URL.createObjectURL(file));
-    const formData = new FormData();
-    formData.append('avatar', file);
-    setUploading(true);
-    try {
-      const res = await axios.post('/api/users/avatar', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      setUser((prev) => ({ ...prev, avatar: res.data.avatar }));
-      setAvatarPreview(res.data.avatar);
-    } catch (err) {
-      showToast('Failed to upload avatar.', 'error');
-    } finally {
-      setUploading(false);
-    }
-  };
+  // Avatar upload UI/handler removed for now (not used)
 
   // Mock user statistics
   const userStats = {

@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, X, Upload, Video, FileText, HelpCircle, Save } from 'lucide-react';
+import { ArrowLeft, Plus, X, Save } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { educationCategories, courseSubjects } from '../data/sdg4';
 import { useToast } from '../context/ToastContext';
 
-interface CreateCourseProps {
-  setCurrentView: (view: string) => void;
-}
 
 interface Lesson {
   id: string;
@@ -209,7 +206,7 @@ const CreateCourse: React.FC = () => {
         {/* Progress Steps - Mobile Optimized */}
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-            {steps.map((step, index) => (
+              {steps.map((step, index) => (
               <div key={step.id} className="flex items-center">
                 <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full text-sm sm:text-base ${
                   currentStep >= step.id ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
@@ -657,7 +654,7 @@ const CreateCourse: React.FC = () => {
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Course Quizzes</h3>
                   <div className="space-y-3">
-                    {quizzes.map((quiz, index) => (
+                    {quizzes.map((quiz) => (
                       <div key={quiz.id} className="p-4 border border-gray-200 rounded-lg">
                         <div className="flex items-center justify-between">
                           <div>

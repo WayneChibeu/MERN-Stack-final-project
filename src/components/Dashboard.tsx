@@ -1,81 +1,94 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Users, Award, TrendingUp, Play, Clock, Star, Globe } from 'lucide-react';
+import { BookOpen, Users, Award, Play, Clock, Star, Globe } from 'lucide-react';
 import { sdg4Data, educationCategories } from '../data/sdg4';
 import { useAuth } from '../context/AuthContext';
+import { apiFetch } from '../utils/apiFetch';
 
-const getInitials = (name) => {
+const getInitials = (name: string): string => {
   if (!name) return '';
   const parts = name.split(' ');
-  return parts.map((p) => p[0]).join('').toUpperCase();
+  return parts.map((p: string) => p[0]).join('').toUpperCase();
 };
+
+interface ApiStats {
+  totalProjects?: number;
+  activeProjects?: number;
+  completedProjects?: number;
+  totalUsers?: number;
+  totalContributions?: number;
+  totalFunding?: number;
+  sdgDistribution?: Array<{ _id: number; count: number }>;
+}
+
+interface Course {
+  _id: string;
+  id?: string;
+  title: string;
+  instructor_id: { name: string; email: string; avatar?: string };
+  students_count: number;
+  rating: number;
+  duration: number;
+  image_url: string;
+  category: string;
+}
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
+  const [stats, setStats] = useState<{ title: string; value: string; change: string; icon: React.ComponentType<any>; color: string }[]>([]);
+  const [featuredCourses, setFeaturedCourses] = useState<Course[]>([]);
 
-  const stats = [
-    {
-      title: 'Active Courses',
-      value: '2,847',
-      change: '+12%',
-      icon: BookOpen,
-      color: 'bg-blue-500'
-    },
-    {
-      title: 'Total Learners',
-      value: '45,231',
-      change: '+8%',
-      icon: Users,
-      color: 'bg-green-500'
-    },
-    {
-      title: 'Certificates Issued',
-      value: '12,456',
-      change: '+15%',
-      icon: Award,
-      color: 'bg-purple-500'
-    },
-    {
-      title: 'Global Reach',
-      value: '127 Countries',
-      change: '+3',
-      icon: Globe,
-      color: 'bg-orange-500'
-    }
-  ];
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
 
-  const featuredCourses = [
-    {
-      id: '1',
-      title: 'Digital Literacy for Beginners',
-      instructor: 'Dr. Sarah Johnson',
-      students: 1234,
-      rating: 4.8,
-      duration: '6 weeks',
-      image: 'https://images.pexels.com/photos/4144923/pexels-photo-4144923.jpeg?auto=compress&cs=tinysrgb&w=500',
-      category: 'Digital Literacy'
-    },
-    {
-      id: '2',
-      title: 'Mathematics for Primary Education',
-      instructor: 'Prof. Michael Chen',
-      students: 892,
-      rating: 4.9,
-      duration: '8 weeks',
-      image: 'https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=500',
-      category: 'Primary Education'
-    },
-    {
-      id: '3',
-      title: 'Sustainable Development Education',
-      instructor: 'Dr. Amara Okafor',
-      students: 567,
-      rating: 4.7,
-      duration: '4 weeks',
-      image: 'https://images.pexels.com/photos/8926558/pexels-photo-8926558.jpeg?auto=compress&cs=tinysrgb&w=500',
-      category: 'Environmental Studies'
-    }
-  ];
+        // Fetch stats
+        const statsData: ApiStats = await apiFetch('/stats');
+        const newStats = [
+          {
+            title: 'Active Projects',
+            value: (statsData.activeProjects || 0).toString(),
+            change: `+${Math.floor((statsData.activeProjects || 0) * 0.15)}`,
+            icon: BookOpen,
+            color: 'bg-blue-500'
+          },
+          {
+            title: 'Total Learners',
+            value: (statsData.totalUsers || 0).toString(),
+            change: `+${Math.floor((statsData.totalUsers || 0) * 0.08)}`,
+            icon: Users,
+            color: 'bg-green-500'
+          },
+          {
+            title: 'Total Contributions',
+            value: (statsData.totalContributions || 0).toString(),
+            change: `+${Math.floor((statsData.totalContributions || 0) * 0.15)}`,
+            icon: Award,
+            color: 'bg-purple-500'
+          },
+          {
+            title: 'Total Funding',
+            value: `$${(statsData.totalFunding || 0).toLocaleString()}`,
+            change: `+${Math.floor((statsData.totalFunding || 0) * 0.12)}%`,
+            icon: Globe,
+            color: 'bg-orange-500'
+          }
+        ];
+        setStats(newStats);
+
+        // Fetch courses
+        const coursesData: Course[] = await apiFetch('/courses?sortBy=popular');
+        setFeaturedCourses(coursesData.slice(0, 3));
+      } catch (error) {
+        console.error('Failed to fetch dashboard data:', error);
+        // Set default empty states on error
+        setStats([]);
+        setFeaturedCourses([]);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -92,7 +105,7 @@ const Dashboard: React.FC = () => {
             />
           ) : (
             <div className="w-12 h-12 rounded-full bg-teal-200 flex items-center justify-center text-xl font-bold text-teal-700" aria-label="Your profile initials">
-              {getInitials(user?.name)}
+              {getInitials(user?.name ?? '')}
             </div>
           )}
         </div>
@@ -236,10 +249,10 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="grid-responsive">
             {featuredCourses.map((course) => (
-              <div key={course.id} className="card overflow-hidden hover:shadow-lg transition-shadow">
+              <div key={course._id || course.id} className="card overflow-hidden hover:shadow-lg transition-shadow">
                 <div className="relative">
                   <img
-                    src={course.image}
+                    src={course.image_url || 'https://via.placeholder.com/500x300'}
                     alt={course.title}
                     className="w-full h-48 object-cover"
                   />
@@ -254,16 +267,16 @@ const Dashboard: React.FC = () => {
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{course.title}</h3>
-                  <p className="text-gray-600 text-small mb-4">by {course.instructor}</p>
+                  <p className="text-gray-600 text-small mb-4">by {course.instructor_id?.name || 'Unknown Instructor'}</p>
                   <div className="flex items-center justify-between text-small text-gray-500 mb-4">
                     <div className="flex items-center space-x-4">
                       <div className="flex items-center space-x-1">
                         <Users className="w-4 h-4" />
-                        <span>{course.students.toLocaleString()}</span>
+                        <span>{(course.students_count || 0).toLocaleString()}</span>
                       </div>
                       <div className="flex items-center space-x-1">
                         <Clock className="w-4 h-4" />
-                        <span>{course.duration}</span>
+                        <span>{course.duration || 0} hours</span>
                       </div>
                     </div>
                     <div className="flex items-center space-x-1">

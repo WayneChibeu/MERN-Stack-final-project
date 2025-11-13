@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Save, Upload, DollarSign, Target, FileText } from 'lucide-react';
+import { ArrowLeft, Save, Upload, DollarSign } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { sdgsData } from '../data/sdgs';

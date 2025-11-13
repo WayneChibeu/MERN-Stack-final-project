@@ -8,6 +8,7 @@ interface SDGCardProps {
 }
 
 const SDGCard: React.FC<SDGCardProps> = ({ sdg, onClick }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const IconComponent = LucideIcons[sdg.icon as keyof typeof LucideIcons] as React.ComponentType<any>;
 
   return (

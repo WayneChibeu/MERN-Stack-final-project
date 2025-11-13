@@ -1,10 +1,9 @@
 import React from 'react';
-import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { Settings as SettingsIcon, Bell, Shield, User, Key, Globe } from 'lucide-react';
+import { Settings as SettingsIcon, Bell, Shield, User, Globe } from 'lucide-react';
 
 const Settings: React.FC = () => {
-  const { user } = useAuth();
+  // user info not needed in this view
 
   const settingsSections = [
     {
