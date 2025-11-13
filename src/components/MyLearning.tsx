@@ -317,7 +317,8 @@ const MyLearning: React.FC<MyLearningProps> = ({ setCurrentView, setSelectedCour
                             </div>
                             <div className="text-sm">
                               <span className="text-gray-500">Time spent:</span>
-                            <p className="font-medium text-gray-900">{Math.round(enrollment.time_spent / 60)} hours</p>
+                              <p className="font-medium text-gray-900">{Math.round(enrollment.time_spent / 60)} hours</p>
+                            </div>
                           </div>
                         </div>
 
