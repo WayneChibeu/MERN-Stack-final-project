@@ -1,8 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User, Mail, Calendar, Award, BookOpen, Edit, Save, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { apiFetch } from '../utils/apiFetch';
 import Button from './ui/Button';
+
+// Helper function to format join date
+const getJoinedDate = (created_at?: string): string => {
+  if (!created_at) return 'Joined recently';
+  const date = new Date(created_at);
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+  return `Joined ${month} ${year}`;
+};
 
 
 interface ProfileProps {
@@ -13,6 +25,16 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
+  const [userStats, setUserStats] = useState({
+    coursesEnrolled: 0,
+    coursesCompleted: 0,
+    certificatesEarned: 0,
+    hoursLearned: 0,
+    coursesCreated: 0,
+    studentsImpacted: 0
+  });
+  const [achievements, setAchievements] = useState<any[]>([]);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -23,6 +45,157 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
     twitter: ''
   });
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar || '');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle avatar file selection and upload
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select an image file', 'error');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      showToast('Image size must be less than 5MB', 'error');
+      return;
+    }
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to server
+    setIsUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found. Please log in again.');
+      }
+
+      console.log('Uploading avatar with token:', token.substring(0, 20) + '...');
+      
+      const response = await fetch('/api/users/avatar', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      console.log('Avatar upload response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Avatar upload error response:', errorData);
+        throw new Error(errorData.error || `Upload failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      setAvatarPreview(data.avatar);
+      showToast('Avatar uploaded successfully', 'success');
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      showToast(error instanceof Error ? error.message : 'Failed to upload avatar', 'error');
+      // Reset preview on error
+      setAvatarPreview(user?.avatar || '');
+    } finally {
+      setIsUploadingAvatar(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Fetch user statistics and activity on mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // Fetch enrollments
+        const enrollments: any[] = await apiFetch('/user/enrolled-courses');
+        const completed = enrollments.filter(e => e.status === 'completed').length;
+        const inProgress = enrollments.filter(e => e.status === 'enrolled' || e.status === 'in-progress').length;
+        const totalHours = Math.round(enrollments.reduce((sum, e) => sum + (e.time_spent || 0), 0) / 60);
+
+        setUserStats({
+          coursesEnrolled: inProgress,
+          coursesCompleted: completed,
+          certificatesEarned: completed,
+          hoursLearned: totalHours,
+          coursesCreated: user?.role === 'teacher' ? 0 : 0,
+          studentsImpacted: user?.role === 'teacher' ? 0 : 0
+        });
+
+        // Set achievements based on actual data
+        const earnedAchievements = [];
+        if (completed > 0) {
+          earnedAchievements.push({
+            id: 1,
+            title: 'First Course Completed',
+            description: 'Completed your first course on EduConnect',
+            icon: '🎓',
+            earned: true,
+            date: new Date().toISOString().split('T')[0]
+          });
+        }
+        if (completed >= 3) {
+          earnedAchievements.push({
+            id: 2,
+            title: 'Digital Literacy Champion',
+            description: 'Completed 3 digital literacy courses',
+            icon: '💻',
+            earned: true,
+            date: new Date().toISOString().split('T')[0]
+          });
+        }
+        earnedAchievements.push(
+          {
+            id: 3,
+            title: 'Learning Streak',
+            description: 'Learned for 7 consecutive days',
+            icon: '🔥',
+            earned: false,
+            date: null
+          },
+          {
+            id: 4,
+            title: 'Community Helper',
+            description: 'Helped 10 fellow learners in discussions',
+            icon: '🤝',
+            earned: false,
+            date: null
+          }
+        );
+        setAchievements(earnedAchievements);
+
+        // Set recent activity based on enrollments
+        const activity = enrollments.slice(0, 4).map((enrollment, idx) => ({
+          id: idx + 1,
+          type: 'course_enrolled',
+          title: `Enrolled in "${enrollment.course_id?.title || 'Course'}"`,
+          date: new Date(enrollment.enrollment_date).toISOString().split('T')[0],
+          icon: '📚'
+        }));
+        setRecentActivity(activity);
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+
+    if (user) {
+      fetchUserData();
+    }
+  }, [user]);
 
   const handleSave = () => {
     try {
@@ -53,84 +226,6 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
 
   // Avatar upload UI/handler removed for now (not used)
 
-  // Mock user statistics
-  const userStats = {
-    coursesEnrolled: 5,
-    coursesCompleted: 2,
-    certificatesEarned: 2,
-    hoursLearned: 95,
-    coursesCreated: user?.role === 'teacher' ? 8 : 0,
-    studentsImpacted: user?.role === 'teacher' ? 2847 : 0
-  };
-
-  // Mock achievements
-  const achievements = [
-    {
-      id: 1,
-      title: 'First Course Completed',
-      description: 'Completed your first course on EduConnect',
-      icon: '🎓',
-      earned: true,
-      date: '2024-01-10'
-    },
-    {
-      id: 2,
-      title: 'Digital Literacy Champion',
-      description: 'Completed 3 digital literacy courses',
-      icon: '💻',
-      earned: true,
-      date: '2024-01-15'
-    },
-    {
-      id: 3,
-      title: 'Learning Streak',
-      description: 'Learned for 7 consecutive days',
-      icon: '🔥',
-      earned: false,
-      date: null
-    },
-    {
-      id: 4,
-      title: 'Community Helper',
-      description: 'Helped 10 fellow learners in discussions',
-      icon: '🤝',
-      earned: false,
-      date: null
-    }
-  ];
-
-  // Mock recent activity
-  const recentActivity = [
-    {
-      id: 1,
-      type: 'course_completed',
-      title: 'Completed "Digital Literacy Fundamentals"',
-      date: '2024-01-20',
-      icon: '✅'
-    },
-    {
-      id: 2,
-      type: 'certificate_earned',
-      title: 'Earned certificate for "Adult Literacy Program"',
-      date: '2024-01-18',
-      icon: '🏆'
-    },
-    {
-      id: 3,
-      type: 'course_enrolled',
-      title: 'Enrolled in "Environmental Science & Sustainability"',
-      date: '2024-01-15',
-      icon: '📚'
-    },
-    {
-      id: 4,
-      type: 'discussion_post',
-      title: 'Posted in "Mathematics for Primary Education" discussion',
-      date: '2024-01-12',
-      icon: '💬'
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
@@ -139,17 +234,41 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 h-24 sm:h-32"></div>
           <div className="relative px-4 sm:px-6 pb-4 sm:pb-6">
             <div className="flex flex-col sm:flex-row sm:items-end space-y-4 sm:space-y-0 sm:space-x-6 -mt-12 sm:-mt-16">
-              <div className="w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center mx-auto sm:mx-0">
-                {avatarPreview ? (
-                  <img
-                    src={avatarPreview}
-                    alt={user?.name}
-                    className="w-full h-full rounded-full object-cover"
-                  />
-                ) : (
-                  <User className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
+              <div className="relative">
+                <div 
+                  className="w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center mx-auto sm:mx-0 cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {avatarPreview ? (
+                    <img
+                      src={avatarPreview}
+                      alt={user?.name}
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
+                  )}
+                </div>
+                <div className="absolute bottom-0 right-0 bg-blue-600 rounded-full p-2 shadow-md hover:bg-blue-700 transition-colors cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                {isUploadingAvatar && (
+                  <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                    <div className="animate-spin">
+                      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full"></div>
+                    </div>
+                  </div>
                 )}
               </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                className="hidden"
+              />
               <div className="flex-1 pb-4 text-center sm:text-left">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                   <div>
@@ -162,7 +281,7 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                       </div>
                       <div className="flex items-center justify-center sm:justify-start space-x-1">
                         <Calendar className="w-4 h-4" />
-                        <span>Joined January 2024</span>
+                        <span>{getJoinedDate(user?.created_at)}</span>
                       </div>
                     </div>
                   </div>
@@ -210,6 +329,32 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
 
               <div className="space-y-4">
                 <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Profile Picture
+                    </label>
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0 border border-gray-300">
+                        {avatarPreview ? (
+                          <img
+                            src={avatarPreview}
+                            alt={user?.name}
+                            className="w-full h-full rounded-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-8 h-8 text-gray-400" />
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploadingAvatar}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors text-sm font-medium"
+                      >
+                        {isUploadingAvatar ? 'Uploading...' : 'Change Picture'}
+                      </button>
+                    </div>
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Full Name

@@ -12,42 +12,42 @@
 
   /* Heading hierarchy */
   h1 {
-    @apply text-3xl md:text-4xl font-bold text-gray-900 leading-tight;
+    @apply text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-50 leading-tight;
   }
 
   h2 {
-    @apply text-2xl md:text-3xl font-semibold text-gray-900 leading-tight;
+    @apply text-2xl md:text-3xl font-semibold text-gray-900 dark:text-gray-50 leading-tight;
   }
 
   h3 {
-    @apply text-xl md:text-2xl font-semibold text-gray-900 leading-tight;
+    @apply text-xl md:text-2xl font-semibold text-gray-900 dark:text-gray-50 leading-tight;
   }
 
   h4 {
-    @apply text-lg md:text-xl font-medium text-gray-900 leading-tight;
+    @apply text-lg md:text-xl font-medium text-gray-900 dark:text-gray-50 leading-tight;
   }
 
   h5 {
-    @apply text-base md:text-lg font-medium text-gray-900 leading-tight;
+    @apply text-base md:text-lg font-medium text-gray-900 dark:text-gray-50 leading-tight;
   }
 
   h6 {
-    @apply text-sm md:text-base font-medium text-gray-900 leading-tight;
+    @apply text-sm md:text-base font-medium text-gray-900 dark:text-gray-50 leading-tight;
   }
 
   /* Body text */
   p {
-    @apply text-base text-gray-700 leading-relaxed;
+    @apply text-base text-gray-700 dark:text-gray-300 leading-relaxed;
   }
 
   /* Small text */
   .text-small {
-    @apply text-sm text-gray-600 leading-relaxed;
+    @apply text-sm text-gray-600 dark:text-gray-400 leading-relaxed;
   }
 
   /* Caption text */
   .text-caption {
-    @apply text-xs text-gray-500 leading-relaxed;
+    @apply text-xs text-gray-500 dark:text-gray-500 leading-relaxed;
   }
 }
 
@@ -55,11 +55,11 @@
 @layer components {
   /* Card components with consistent spacing */
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden;
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden;
   }
 
   .card-header {
-    @apply px-6 py-4 border-b border-gray-200 bg-gray-50;
+    @apply px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700;
   }
 
   .card-body {
@@ -67,7 +67,7 @@
   }
 
   .card-footer {
-    @apply px-6 py-4 border-t border-gray-200 bg-gray-50;
+    @apply px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700;
   }
 
   /* Section spacing */
@@ -94,19 +94,19 @@
   }
 
   .form-label {
-    @apply block text-sm font-medium text-gray-700 mb-2;
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
   }
 
   .form-input {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors;
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
   }
 
   .form-textarea {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical;
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none;
   }
 
   .form-select {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors;
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
   }
 
   /* Button spacing */
@@ -146,15 +146,44 @@
 
   /* Divider spacing */
   .divider {
-    @apply border-t border-gray-200 my-6;
+    @apply border-t border-gray-200 dark:border-gray-700 my-6;
   }
 
   .divider-sm {
-    @apply border-t border-gray-200 my-4;
+    @apply border-t border-gray-200 dark:border-gray-700 my-4;
   }
 
   .divider-lg {
-    @apply border-t border-gray-200 my-8;
+    @apply border-t border-gray-200 dark:border-gray-700 my-8;
+  }
+
+  /* Mobile-friendly utility components */
+  .touch-target {
+    @apply min-h-12 min-w-12 flex items-center justify-center;
+  }
+
+  .mobile-padding {
+    @apply px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4;
+  }
+
+  .mobile-margin {
+    @apply mb-3 sm:mb-4 md:mb-6;
+  }
+
+  .mobile-grid-2 {
+    @apply grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:gap-6;
+  }
+
+  .mobile-text-sm {
+    @apply text-xs sm:text-sm;
+  }
+
+  .mobile-text-base {
+    @apply text-sm sm:text-base;
+  }
+
+  .mobile-text-lg {
+    @apply text-base sm:text-lg;
   }
 }
 
@@ -202,4 +231,110 @@
   to {
     opacity: 1;
   }
+}
+
+/* Global Dark Mode Styles */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  color: #f0f0f0;
+}
+
+.dark p {
+  color: #d1d5db;
+}
+
+.dark .text-small {
+  color: #9ca3af;
+}
+
+.dark .text-caption {
+  color: #6b7280;
+}
+
+.dark .bg-white {
+  background-color: #1f2937;
+}
+
+.dark .bg-gray-50 {
+  background-color: #111827;
+}
+
+.dark .bg-gray-100 {
+  background-color: #374151;
+}
+
+.dark .bg-gray-200 {
+  background-color: #4b5563;
+}
+
+.dark .border-gray-200 {
+  border-color: #374151;
+}
+
+.dark .border-gray-300 {
+  border-color: #4b5563;
+}
+
+.dark .text-gray-500 {
+  color: #9ca3af;
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db;
+}
+
+.dark .text-gray-700 {
+  color: #e5e7eb;
+}
+
+.dark .text-gray-900 {
+  color: #f0f0f0;
+}
+
+/* Dark mode badge colors */
+.dark .bg-red-100 {
+  background-color: #7f1d1d;
+  color: #fecaca;
+}
+
+.dark .bg-green-100 {
+  background-color: #15803d;
+  color: #86efac;
+}
+
+.dark .bg-yellow-100 {
+  background-color: #713f12;
+  color: #fef08a;
+}
+
+.dark .bg-blue-100 {
+  background-color: #1e3a8a;
+  color: #93c5fd;
+}
+
+.dark .bg-purple-100 {
+  background-color: #581c87;
+  color: #d8b4fe;
+}
+
+.dark .bg-orange-100 {
+  background-color: #7c2d12;
+  color: #fed7aa;
+}
+
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #1f2937;
+  color: #f0f0f0;
+  border-color: #4b5563;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #9ca3af;
 }

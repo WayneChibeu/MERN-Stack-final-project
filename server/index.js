@@ -11,9 +11,23 @@ import Course from './models/Course.js';
 import Enrollment from './models/Enrollment.js';
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 import Notification from './models/Notification.js';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
+import {
+  loginLimiter,
+  apiLimiter,
+  signupLimiter,
+  sanitizeData,
+  validateEmail,
+  validatePassword,
+  validateUsername,
+  sanitizeString,
+  securityHeaders,
+  securityLogger,
+  preventParameterPollution,
+} from './middleware/security.js';
 
 dotenv.config();
 
@@ -29,7 +43,11 @@ const server = http.createServer(app);
 // Central CORS options used for both Express and Socket.IO
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, server-to-server)
+    // In development, allow any origin
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    // In production, be more restrictive
     if (!origin) return callback(null, true);
     if (origin === FRONTEND_URL) return callback(null, true);
     return callback(new Error('Not allowed by CORS'));
@@ -47,13 +65,58 @@ const io = new SocketIOServer(server, {
   }
 });
 
-// Store userId <-> socketId mapping
+// Store userId <-> socketId mapping and chat rooms
 const userSockets = new Map();
+const chatRooms = new Map(); // room -> [messages]
 
 io.on('connection', (socket) => {
   // Listen for user identification
   socket.on('identify', (userId) => {
     userSockets.set(userId, socket.id);
+  });
+
+  // Chat functionality
+  socket.on('join-room', (room) => {
+    socket.join(room);
+    // Initialize room if doesn't exist
+    if (!chatRooms.has(room)) {
+      chatRooms.set(room, []);
+    }
+    // Send existing messages to the user
+    socket.emit('load-messages', chatRooms.get(room) || []);
+  });
+
+  socket.on('leave-room', (room) => {
+    socket.leave(room);
+  });
+
+  socket.on('load-messages', (data, callback) => {
+    const messages = chatRooms.get(data.room) || [];
+    if (callback) callback(messages);
+  });
+
+  socket.on('send-message', (message) => {
+    const room = message.room || 'global';
+    // Store message
+    if (!chatRooms.has(room)) {
+      chatRooms.set(room, []);
+    }
+    const messages = chatRooms.get(room);
+    messages.push(message);
+    // Keep only last 100 messages per room
+    if (messages.length > 100) {
+      messages.shift();
+    }
+    // Broadcast to room
+    io.to(room).emit('new-message', message);
+  });
+
+  socket.on('typing', (data) => {
+    socket.to(data.room).emit('user-typing', { user: data.user, room: data.room });
+  });
+
+  socket.on('stop-typing', (data) => {
+    socket.to(data.room).emit('user-stopped-typing', { room: data.room });
   });
 
   socket.on('disconnect', () => {
@@ -73,10 +136,18 @@ connectDB();
 // Use CORS for all routes and explicitly handle preflight requests
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
-app.use(express.json());
+
+// Security middleware - IMPORTANT: Order matters!
+app.use(securityHeaders); // Set security headers first
+app.use(securityLogger); // Log all requests for security audit
+app.use(express.json({ limit: '10kb' })); // Limit payload size
+app.use(sanitizeData); // Prevent NoSQL injection
+app.use(preventParameterPollution); // Prevent parameter pollution
+app.use(apiLimiter); // Global rate limiting
 
 // JWT secret
 const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret';
+const JWT_SECRET_OLD = process.env.JWT_SECRET_OLD || 'your-jwt-secret';
 
 // Auth middleware
 const authenticateToken = (req, res, next) => {
@@ -84,22 +155,34 @@ const authenticateToken = (req, res, next) => {
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
+    console.error('No token provided');
     return res.status(401).json({ error: 'Access token required' });
   }
 
+  // Try current secret first
   jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: 'Invalid token' });
+    if (!err) {
+      req.user = user;
+      return next();
     }
-    req.user = user;
-    next();
+    
+    // If current secret fails, try old secret for backward compatibility
+    jwt.verify(token, JWT_SECRET_OLD, (errOld, userOld) => {
+      if (errOld) {
+        console.error('Token verification failed:', err.message);
+        return res.status(403).json({ error: 'Invalid token', details: err.message });
+      }
+      req.user = userOld;
+      next();
+    });
   });
 };
 
 // Multer setup for avatar uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/avatars');
+    const uploadDir = path.join(process.cwd(), 'uploads', 'avatars');
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
     const ext = path.extname(file.originalname);
@@ -115,8 +198,18 @@ const fileFilter = (req, file, cb) => {
 };
 const upload = multer({ storage, fileFilter });
 
+// Ensure uploads directory exists
+const uploadsDir = path.join(process.cwd(), 'uploads');
+const avatarsDir = path.join(uploadsDir, 'avatars');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+if (!fs.existsSync(avatarsDir)) {
+  fs.mkdirSync(avatarsDir, { recursive: true });
+}
+
 // Serve uploads directory as static
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(uploadsDir));
 
 // Avatar upload endpoint
 app.post('/api/users/avatar', authenticateToken, upload.single('avatar'), async (req, res) => {
@@ -124,20 +217,62 @@ app.post('/api/users/avatar', authenticateToken, upload.single('avatar'), async 
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
+    
     const avatarUrl = `/uploads/avatars/${req.file.filename}`;
-    await User.findByIdAndUpdate(req.user.userId, { avatar: avatarUrl });
-    res.json({ avatar: avatarUrl });
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.userId,
+      { avatar: avatarUrl },
+      { new: true }
+    );
+    
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json({ avatar: avatarUrl, success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Avatar upload error:', error);
+    res.status(500).json({ error: error.message || 'Failed to upload avatar' });
   }
+});
+
+// Handle multer errors
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'FILE_TOO_LARGE') {
+      return res.status(400).json({ error: 'File too large' });
+    }
+    return res.status(400).json({ error: err.message });
+  }
+  if (err.message === 'Only image files are allowed!') {
+    return res.status(400).json({ error: 'Only image files are allowed' });
+  }
+  next(err);
 });
 
 // Routes
 
 // Auth routes
-app.post('/api/auth/register', async (req, res) => {
+app.post('/api/auth/register', signupLimiter, async (req, res) => {
   try {
     const { email, password, name, role } = req.body;
+
+    // Validate email
+    if (!validateEmail(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    // Validate password strength
+    if (!validatePassword(password)) {
+      return res.status(400).json({ 
+        error: 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character' 
+      });
+    }
+
+    // Validate name
+    if (!name || name.trim().length < 2) {
+      return res.status(400).json({ error: 'Name must be at least 2 characters' });
+    }
 
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -176,7 +311,7 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', loginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 

@@ -1,154 +1,140 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Play, Clock, Users, Star, BookOpen, Award, MessageCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { apiFetch } from '../utils/apiFetch';
 
 interface CourseDetailProps {
   courseId: string | null;
   setCurrentView: (view: string) => void;
 }
 
+interface Lesson {
+  _id: string;
+  title: string;
+  description: string;
+  duration: number;
+  is_free?: boolean;
+  completed?: boolean;
+}
+
+interface Course {
+  _id: string;
+  title: string;
+  description: string;
+  instructor_id: any;
+  category: string;
+  subject: string;
+  level: string;
+  duration: number;
+  price: number;
+  image_url: string;
+  rating: number;
+  students_count: number;
+  certificate: boolean;
+  lessons: Lesson[];
+  skills?: string[];
+  requirements?: string[];
+  whatYouLearn?: string[];
+}
+
 const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView }) => {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
+  const [course, setCourse] = useState<Course | null>(null);
+  const [instructor, setInstructor] = useState<any>(null);
   const [enrolled, setEnrolled] = useState(false);
+  const [isLoadingCourse, setIsLoadingCourse] = useState(true);
+  const [reviews, setReviews] = useState<any[]>([]);
 
-  // Mock course data - in real app, fetch by courseId
-  const course = {
-    id: courseId || '1',
-    title: 'Digital Literacy Fundamentals',
-    description: 'Master essential digital skills for the modern world. This comprehensive course covers computer basics, internet safety, digital communication, and productivity tools that are essential for personal and professional success in today\'s digital age.',
-    instructor: {
-      name: 'Dr. Sarah Johnson',
-      avatar: 'https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=100',
-      bio: 'Digital Education Specialist with 15+ years of experience in technology training and curriculum development.',
-      rating: 4.9,
-      students: 12450,
-      courses: 8
-    },
-    category: 'Digital Literacy',
-    subject: 'Technology',
-    level: 'beginner',
-    duration: 40,
-    price: 0,
-    rating: 4.8,
-    students: 1234,
-    reviews: 456,
-    image: 'https://images.pexels.com/photos/4144923/pexels-photo-4144923.jpeg?auto=compress&cs=tinysrgb&w=800',
-    certificate: true,
-    lastUpdated: '2024-01-15',
-    language: 'English',
-    lessons: [
-      {
-        id: '1',
-        title: 'Introduction to Digital Literacy',
-        description: 'Understanding what digital literacy means in today\'s world',
-        duration: 15,
-        is_free: true,
-        completed: false
-      },
-      {
-        id: '2',
-        title: 'Computer Basics and Navigation',
-        description: 'Learn fundamental computer operations and file management',
-        duration: 25,
-        is_free: false,
-        completed: false
-      },
-      {
-        id: '3',
-        title: 'Internet Safety and Security',
-        description: 'Protecting yourself online and understanding digital privacy',
-        duration: 20,
-        is_free: false,
-        completed: false
-      },
-      {
-        id: '4',
-        title: 'Digital Communication Tools',
-        description: 'Email, messaging, and video conferencing best practices',
-        duration: 30,
-        is_free: false,
-        completed: false
-      },
-      {
-        id: '5',
-        title: 'Productivity Software Essentials',
-        description: 'Word processing, spreadsheets, and presentation tools',
-        duration: 35,
-        is_free: false,
-        completed: false
+  // Fetch course data on mount
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      if (!courseId) {
+        setIsLoadingCourse(false);
+        return;
       }
-    ],
-    skills: [
-      'Computer Navigation',
-      'Internet Safety',
-      'Email Communication',
-      'File Management',
-      'Digital Privacy',
-      'Online Research',
-      'Productivity Tools',
-      'Digital Citizenship'
-    ],
-    requirements: [
-      'Basic reading and writing skills',
-      'Access to a computer or tablet',
-      'Stable internet connection',
-      'Willingness to learn and practice'
-    ],
-    whatYouLearn: [
-      'Navigate computers and mobile devices confidently',
-      'Use the internet safely and effectively',
-      'Communicate professionally through digital channels',
-      'Manage files and organize digital content',
-      'Protect personal information online',
-      'Use productivity software for work and personal tasks',
-      'Understand digital citizenship and ethics',
-      'Troubleshoot common technical issues'
-    ]
-  };
 
-  const reviews = [
-    {
-      id: '1',
-      user: 'Maria Rodriguez',
-      avatar: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=100',
-      rating: 5,
-      date: '2024-01-10',
-      comment: 'Excellent course! Dr. Johnson explains everything clearly and the practical exercises really helped me gain confidence with technology.'
-    },
-    {
-      id: '2',
-      user: 'James Wilson',
-      avatar: 'https://images.pexels.com/photos/3777943/pexels-photo-3777943.jpeg?auto=compress&cs=tinysrgb&w=100',
-      rating: 5,
-      date: '2024-01-08',
-      comment: 'Perfect for beginners. I went from being afraid of computers to feeling comfortable using them for work and personal tasks.'
-    },
-    {
-      id: '3',
-      user: 'Lisa Chen',
-      avatar: 'https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=100',
-      rating: 4,
-      date: '2024-01-05',
-      comment: 'Great content and very well organized. The internet safety section was particularly valuable for me.'
-    }
-  ];
+      try {
+        setIsLoadingCourse(true);
+        const courseData: Course = await apiFetch(`/courses/${courseId}`);
+        setCourse(courseData);
 
-  const handleEnroll = () => {
+        // Fetch instructor data if available
+        if (courseData.instructor_id) {
+          try {
+            const instructorData = await apiFetch(`/users/${courseData.instructor_id}`);
+            setInstructor(instructorData);
+          } catch (err) {
+            console.error('Failed to fetch instructor:', err);
+          }
+        }
+
+        // Generate sample reviews based on course rating
+        const sampleReviews = [
+          {
+            id: '1',
+            user: 'Maria Rodriguez',
+            avatar: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=100',
+            rating: 5,
+            date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            comment: 'Excellent course! The instructor explains everything clearly and the practical exercises were very helpful.'
+          },
+          {
+            id: '2',
+            user: 'James Wilson',
+            avatar: 'https://images.pexels.com/photos/3777943/pexels-photo-3777943.jpeg?auto=compress&cs=tinysrgb&w=100',
+            rating: 5,
+            date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            comment: 'Perfect course for my needs. I gained valuable skills and feel confident applying them.'
+          },
+          {
+            id: '3',
+            user: 'Lisa Chen',
+            avatar: 'https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=100',
+            rating: Math.ceil(courseData.rating || 4),
+            date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            comment: 'Great content and very well organized. Highly recommend this course!'
+          }
+        ];
+        setReviews(sampleReviews);
+      } catch (error) {
+        console.error('Failed to fetch course:', error);
+        showToast('Failed to load course details', 'error');
+        setIsLoadingCourse(false);
+      }
+    };
+
+    fetchCourseData();
+  }, [courseId, showToast]);
+
+  const handleEnroll = async () => {
     if (!user) {
       setCurrentView('login');
       showToast('Please log in to enroll in a course.', 'warning');
       return;
     }
+
+    if (!course) {
+      showToast('Course not loaded', 'error');
+      return;
+    }
+
     try {
       setEnrolled(true);
-      // Here you would call your enrollment API
+      // Call enrollment API
+      await apiFetch('/enroll', {
+        method: 'POST',
+        body: JSON.stringify({
+          course_id: course._id
+        })
+      });
       showToast('Enrolled in course successfully!', 'success');
     } catch (err) {
       console.error(err);
       showToast('Error enrolling in course. Please try again.', 'error');
+      setEnrolled(false);
     }
   };
 
@@ -160,6 +146,36 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
       />
     ));
   };
+
+  if (isLoadingCourse) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading course details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <button
+            onClick={() => setCurrentView('courses')}
+            className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back to Courses
+          </button>
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <p className="text-gray-600">Course not found.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -180,7 +196,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
             <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
               <div className="relative">
                 <img
-                  src={course.image}
+                  src={course.image_url}
                   alt={course.title}
                   className="w-full h-64 object-cover"
                 />
@@ -208,7 +224,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
                 <div className="flex items-center space-x-6 text-sm text-gray-500 mb-4">
                   <div className="flex items-center space-x-1">
                     <Users className="w-4 h-4" />
-                    <span>{course.students.toLocaleString()} students</span>
+                    <span>{(course.students_count || 0).toLocaleString()} students</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <Clock className="w-4 h-4" />
@@ -221,18 +237,18 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
                   <div className="flex items-center space-x-1">
                     {renderStars(course.rating)}
                     <span className="font-medium text-gray-900">{course.rating}</span>
-                    <span>({course.reviews} reviews)</span>
+                    <span>({reviews.length} reviews)</span>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-4">
                   <img
-                    src={course.instructor.avatar}
-                    alt={course.instructor.name}
+                    src={instructor?.avatar || 'https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=100'}
+                    alt={instructor?.name || 'Instructor'}
                     className="w-12 h-12 rounded-full object-cover"
                   />
                   <div>
-                    <p className="font-medium text-gray-900">{course.instructor.name}</p>
+                    <p className="font-medium text-gray-900">{instructor?.name || 'Course Instructor'}</p>
                     <p className="text-sm text-gray-500">Course Instructor</p>
                   </div>
                 </div>
@@ -268,43 +284,49 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
                 {/* Overview Tab */}
                 {activeTab === 'overview' && (
                   <div className="space-y-6">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">What you'll learn</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {course.whatYouLearn.map((item, index) => (
-                          <div key={index} className="flex items-start space-x-2">
-                            <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-700">{item}</span>
-                          </div>
-                        ))}
+                    {course.whatYouLearn && course.whatYouLearn.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">What you'll learn</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {course.whatYouLearn.map((item, index) => (
+                            <div key={index} className="flex items-start space-x-2">
+                              <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                              <span className="text-gray-700">{item}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
 
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Skills you'll gain</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {course.skills.map((skill, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                          >
-                            {skill}
-                          </span>
-                        ))}
+                    {course.skills && course.skills.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Skills you'll gain</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {course.skills.map((skill, index) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
 
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Requirements</h3>
-                      <ul className="space-y-2">
-                        {course.requirements.map((req, index) => (
-                          <li key={index} className="flex items-start space-x-2">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full mt-2 flex-shrink-0" />
-                            <span className="text-gray-700">{req}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    {course.requirements && course.requirements.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Requirements</h3>
+                        <ul className="space-y-2">
+                          {course.requirements.map((req, index) => (
+                            <li key={index} className="flex items-start space-x-2">
+                              <div className="w-2 h-2 bg-gray-400 rounded-full mt-2 flex-shrink-0" />
+                              <span className="text-gray-700">{req}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -320,7 +342,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
                     <div className="space-y-3">
                       {course.lessons.map((lesson, index) => (
                         <div
-                          key={lesson.id}
+                          key={lesson._id}
                           className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                         >
                           <div className="flex items-center space-x-4">
@@ -357,25 +379,25 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
                   <div className="space-y-6">
                     <div className="flex items-start space-x-4">
                       <img
-                        src={course.instructor.avatar}
-                        alt={course.instructor.name}
+                        src={instructor?.avatar || 'https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=100'}
+                        alt={instructor?.name || 'Instructor'}
                         className="w-20 h-20 rounded-full object-cover"
                       />
                       <div>
-                        <h3 className="text-xl font-semibold text-gray-900">{course.instructor.name}</h3>
-                        <p className="text-gray-600 mb-2">{course.instructor.bio}</p>
+                        <h3 className="text-xl font-semibold text-gray-900">{instructor?.name || 'Course Instructor'}</h3>
+                        <p className="text-gray-600 mb-2">{instructor?.bio || 'Experienced instructor'}</p>
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
                           <div className="flex items-center space-x-1">
                             <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                            <span>{course.instructor.rating} instructor rating</span>
+                            <span>{instructor?.rating || 4.9} instructor rating</span>
                           </div>
                           <div className="flex items-center space-x-1">
                             <Users className="w-4 h-4" />
-                            <span>{course.instructor.students.toLocaleString()} students</span>
+                            <span>{(instructor?.students || 0).toLocaleString()} students</span>
                           </div>
                           <div className="flex items-center space-x-1">
                             <BookOpen className="w-4 h-4" />
-                            <span>{course.instructor.courses} courses</span>
+                            <span>{instructor?.courses || 0} courses</span>
                           </div>
                         </div>
                       </div>
@@ -391,7 +413,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
                       <div className="flex items-center space-x-2">
                         {renderStars(course.rating)}
                         <span className="font-medium text-gray-900">{course.rating}</span>
-                        <span className="text-gray-500">({course.reviews} reviews)</span>
+                        <span className="text-gray-500">({reviews.length} reviews)</span>
                       </div>
                     </div>
                     <div className="space-y-4">
@@ -469,18 +491,10 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
                   <span className="font-medium text-gray-900">{course.lessons.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Language:</span>
-                  <span className="font-medium text-gray-900">{course.language}</span>
-                </div>
-                <div className="flex justify-between">
                   <span className="text-gray-600">Certificate:</span>
                   <span className="font-medium text-gray-900">
                     {course.certificate ? 'Yes' : 'No'}
                   </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Last updated:</span>
-                  <span className="font-medium text-gray-900">{course.lastUpdated}</span>
                 </div>
               </div>
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider, useToast } from './context/ToastContext';
+import { DarkModeProvider } from './context/DarkModeContext';
 import ToastList from './components/Toast';
 import Navigation from './components/Navigation';
 import Dashboard from './components/Dashboard';
@@ -43,48 +44,50 @@ const DashboardRedirect = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <SocketProvider>
-        <ToastProvider>
-          <ToastListWrapper />
-          <Router>
-            <div className="min-h-screen bg-gray-50 flex flex-col">
-              <nav role="navigation">
-                <Navigation />
-              </nav>
-              <main role="main" className="flex-grow">
-                <Routes>
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                  <Route path="/dashboard" element={<RequireAuth><DashboardRedirect /></RequireAuth>} />
-                  <Route path="/dashboard/student" element={<RequireAuth><Dashboard /></RequireAuth>} />
-                  <Route path="/courses" element={<RequireAuth><CourseCatalog setCurrentView={() => {}} setSelectedCourse={() => {}} /></RequireAuth>} />
-                  <Route path="/course/:id" element={<RequireAuth><CourseDetail courseId="" setCurrentView={() => {}} /></RequireAuth>} />
-                  <Route path="/my-learning" element={<RequireAuth><MyLearning setCurrentView={() => {}} setSelectedCourse={() => {}} /></RequireAuth>} />
-                  <Route path="/projects" element={<RequireAuth><ProjectsList /></RequireAuth>} />
-                  <Route path="/create-project" element={<RequireAuth><CreateProject /></RequireAuth>} />
-                  <Route path="/profile" element={<RequireAuth><Profile setCurrentView={() => {}} /></RequireAuth>} />
-                  <Route path="/settings/notifications" element={<RequireAuth><NotificationSettings /></RequireAuth>} />
-                  <Route path="/settings" element={
-                    <RequireAuth>
-                      <Settings />
-                    </RequireAuth>
-                  } />
-                  {/* Teacher-only routes */}
-                  <Route path="/teacher/dashboard" element={<RequireTeacher><TeacherDashboard /></RequireTeacher>} />
-                  <Route path="/teacher/create-course" element={<RequireTeacher><CreateCourse /></RequireTeacher>} />
-                  {/* Auth routes */}
-                  <Route path="/login" element={<AuthForm type="login" setCurrentView={() => {}} />} />
-                  <Route path="/register" element={<AuthForm type="register" setCurrentView={() => {}} />} />
-                  {/* Fallback */}
-                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                </Routes>
-              </main>
-              <Footer />
-            </div>
-          </Router>
-        </ToastProvider>
-      </SocketProvider>
-    </AuthProvider>
+    <DarkModeProvider>
+      <AuthProvider>
+        <SocketProvider>
+          <ToastProvider>
+            <ToastListWrapper />
+            <Router>
+              <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 transition-colors duration-300 flex flex-col">
+                <nav role="navigation">
+                  <Navigation />
+                </nav>
+                <main role="main" className="flex-grow bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                  <Routes>
+                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="/dashboard" element={<RequireAuth><DashboardRedirect /></RequireAuth>} />
+                    <Route path="/dashboard/student" element={<RequireAuth><Dashboard /></RequireAuth>} />
+                    <Route path="/courses" element={<RequireAuth><CourseCatalog setCurrentView={() => {}} setSelectedCourse={() => {}} /></RequireAuth>} />
+                    <Route path="/course/:id" element={<RequireAuth><CourseDetail courseId="" setCurrentView={() => {}} /></RequireAuth>} />
+                    <Route path="/my-learning" element={<RequireAuth><MyLearning setCurrentView={() => {}} setSelectedCourse={() => {}} /></RequireAuth>} />
+                    <Route path="/projects" element={<RequireAuth><ProjectsList /></RequireAuth>} />
+                    <Route path="/create-project" element={<RequireAuth><CreateProject /></RequireAuth>} />
+                    <Route path="/profile" element={<RequireAuth><Profile setCurrentView={() => {}} /></RequireAuth>} />
+                    <Route path="/settings/notifications" element={<RequireAuth><NotificationSettings /></RequireAuth>} />
+                    <Route path="/settings" element={
+                      <RequireAuth>
+                        <Settings />
+                      </RequireAuth>
+                    } />
+                    {/* Teacher-only routes */}
+                    <Route path="/teacher/dashboard" element={<RequireTeacher><TeacherDashboard /></RequireTeacher>} />
+                    <Route path="/teacher/create-course" element={<RequireTeacher><CreateCourse /></RequireTeacher>} />
+                    {/* Auth routes */}
+                    <Route path="/login" element={<AuthForm type="login" setCurrentView={() => {}} />} />
+                    <Route path="/register" element={<AuthForm type="register" setCurrentView={() => {}} />} />
+                    {/* Fallback */}
+                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                  </Routes>
+                </main>
+                <Footer />
+              </div>
+            </Router>
+          </ToastProvider>
+        </SocketProvider>
+      </AuthProvider>
+    </DarkModeProvider>
   );
 }
 

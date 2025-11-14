@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Trash2, CheckSquare, Bell } from 'lucide-react';
+import { Search, Trash2, CheckSquare, Bell, Moon, Sun, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { useToast, ToastType } from '../context/ToastContext';
+import { useDarkMode } from '../context/DarkModeContext';
 import { User } from '../types';
+import Chat from './Chat';
 import type { Socket } from 'socket.io-client';
 
 const NOTIFICATION_SOUNDS = [
@@ -64,6 +66,19 @@ const Navigation: React.FC = () => {
     user = null;
     logout = null;
   }
+  
+  // Guard useDarkMode for tests
+  let isDarkMode = false;
+  let toggleDarkMode = () => {};
+  try {
+    const darkMode = useDarkMode();
+    isDarkMode = darkMode?.isDarkMode ?? false;
+    toggleDarkMode = darkMode?.toggleDarkMode ?? (() => {});
+  } catch {
+    isDarkMode = false;
+    toggleDarkMode = () => {};
+  }
+  
   // Guard useToast and useSocket for tests where providers may not be present
   let showToast: (msg: string, type?: ToastType) => void = () => {};
   try {
@@ -85,6 +100,7 @@ const Navigation: React.FC = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [loadingNotis, setLoadingNotis] = useState<boolean>(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -261,11 +277,11 @@ const Navigation: React.FC = () => {
     <>
       {/* Notification sound */}
       <audio ref={audioRef} src={selectedSound} preload="auto" />
-      <nav className="bg-white border-b border-gray-100 px-4 py-2 flex items-center justify-between shadow-sm relative">
+      <nav className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-4 py-2 flex items-center justify-between shadow-sm relative">
         {/* Logo */}
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center font-bold text-white text-lg">SDG</div>
-          <span className="font-bold text-lg text-gray-900 tracking-tight">Global Goals</span>
+          <span className="font-bold text-lg text-gray-900 dark:text-white tracking-tight">Global Goals</span>
         </div>
         {/* Desktop Links */}
         <div className="hidden md:flex flex-1 items-center justify-center">
@@ -336,6 +352,41 @@ const Navigation: React.FC = () => {
         </div>
         {/* User Info & Actions */}
         <div className="flex items-center gap-4">
+          {/* Dark Mode Toggle - Modern Animated Switch */}
+          <button
+            onClick={toggleDarkMode}
+            className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 dark:focus:ring-offset-gray-900 ${
+              isDarkMode ? 'bg-gray-700' : 'bg-gray-300'
+            }`}
+            aria-label="Toggle dark mode"
+            title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {/* Animated toggle circle */}
+            <span
+              className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-300 flex items-center justify-center ${
+                isDarkMode ? 'translate-x-7' : 'translate-x-1'
+              }`}
+            >
+              {isDarkMode ? (
+                <Moon className="w-4 h-4 text-gray-700" />
+              ) : (
+                <Sun className="w-4 h-4 text-yellow-500" />
+              )}
+            </span>
+          </button>
+          
+          {/* Chat Button */}
+          {user && (
+            <button
+              onClick={() => setIsChatOpen(!isChatOpen)}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors"
+              aria-label="Open community chat"
+              title="Community Chat"
+            >
+              <MessageCircle className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+            </button>
+          )}
+
           {/* Notifications Bell */}
           {user && (
             <div className="relative" ref={notificationsRef}>
@@ -744,6 +795,9 @@ const Navigation: React.FC = () => {
           </div>
         </div>
       )}
+      
+      {/* Chat Component */}
+      <Chat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} room="global" />
     </>
   );
 };
