@@ -228,6 +228,21 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
     setAvatarPreview(user?.avatar || '');
   };
 
+// --- HELPER START ---
+  const getFullImageUrl = (path: string) => {
+    if (!path) return '';
+    if (path.startsWith('data:') || path.startsWith('http')) return path;
+    
+    // Get backend URL (remove '/api' from the end if it's there)
+    const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace('/api', '');
+    
+    // Remove leading slash from path if it exists to avoid double slashes
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    
+    return `${baseUrl}/${cleanPath}`;
+  };
+  // --- HELPER END ---
+
   // Avatar upload UI/handler removed for now (not used)
 
   return (
@@ -245,7 +260,7 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                 >
                   {avatarPreview ? (
                     <img
-                      src={avatarPreview}
+                      src={getFullImageUrl(avatarPreview)}
                       alt={user?.name}
                       className="w-full h-full rounded-full object-cover"
                     />
@@ -341,7 +356,7 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
                       <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0 border border-gray-300">
                         {avatarPreview ? (
                           <img
-                            src={avatarPreview}
+                            src={getFullImageUrl(avatarPreview)}
                             alt={user?.name}
                             className="w-full h-full rounded-full object-cover"
                           />
