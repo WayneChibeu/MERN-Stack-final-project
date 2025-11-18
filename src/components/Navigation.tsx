@@ -54,8 +54,17 @@ function groupNotificationsByDay(notifications: NotificationType[]): Record<stri
 }
 
 const Navigation: React.FC = () => {
-  // Guard useAuth to avoid test crashes when the auth context/hook isn't
-  // available in the test environment.
+  // --- HELPER: Fix image URL for Render ---
+  const getFullImageUrl = (path: string | undefined) => {
+    if (!path) return '';
+    if (path.startsWith('data:') || path.startsWith('http')) return path;
+    
+    // Get backend URL (remove '/api' from the end if it's there)
+    const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace('/api', '');
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    
+    return `${baseUrl}/${cleanPath}`;
+  };
   let user: User | null = null;
   let logout: (() => void) | null = null;
   try {
@@ -630,7 +639,7 @@ const Navigation: React.FC = () => {
               >
                 {user.avatar ? (
                   <img
-                    src={user.avatar}
+                    src={getFullImageUrl(user.avatar)}
                     alt="Your profile"
                     className="w-8 h-8 rounded-full border-2 border-indigo-200 object-cover"
                   />
