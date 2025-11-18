@@ -84,7 +84,11 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
 
       console.log('Uploading avatar with token:', token.substring(0, 20) + '...');
       
-      const response = await fetch('/api/users/avatar', {
+      // Define the API URL using your environment variable
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
+      // Send the request to the full backend URL
+      const response = await fetch(`${API_URL}/users/avatar`, {
         method: 'POST',
         body: formData,
         credentials: 'include',
