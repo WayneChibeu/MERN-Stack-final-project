@@ -59,7 +59,7 @@ const corsOptions = {
 
 const io = new SocketIOServer(server, {
   cors: {
-    origin: FRONTEND_URL,
+    origin: ["https://mern-stack-final-project.vercel.app", "http://localhost:5173"],
     methods: ['GET', 'POST'],
     credentials: true
   }
