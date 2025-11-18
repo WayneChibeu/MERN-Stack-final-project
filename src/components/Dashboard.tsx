@@ -121,6 +121,17 @@ const Dashboard: React.FC = () => {
   const handleImageError = (courseId: string) => {
     setBrokenImages(prev => new Set([...prev, courseId]));
   };
+// --- HELPER START ---
+  const getFullImageUrl = (path: string | undefined) => {
+    if (!path) return '';
+    if (path.startsWith('data:') || path.startsWith('http')) return path;
+    
+    const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace('/api', '');
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    
+    return `${baseUrl}/${cleanPath}`;
+  };
+  // --- HELPER END ---
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
@@ -130,7 +141,7 @@ const Dashboard: React.FC = () => {
           <span className="px-4 py-1 rounded-full bg-white text-teal-700 font-semibold shadow text-sm ml-4" aria-label="Student role">Student</span>
           {user?.avatar ? (
             <img
-              src={user.avatar}
+              src={getFullImageUrl(user.avatar)}
               alt="Your profile"
               className="w-12 h-12 rounded-full border-2 border-white shadow object-cover"
               aria-label="Your profile"
