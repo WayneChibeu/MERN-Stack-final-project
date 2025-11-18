@@ -77,7 +77,7 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentView }) => {
       const formData = new FormData();
       formData.append('avatar', file);
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth-token');
       if (!token) {
         throw new Error('No authentication token found. Please log in again.');
       }
