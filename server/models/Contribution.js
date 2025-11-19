@@ -21,6 +21,19 @@ const contributionSchema = new mongoose.Schema({
     enum: ['monetary', 'time', 'resource'],
     required: true
   },
+  payment_status: {
+    type: String,
+    enum: ['pending', 'completed', 'failed'],
+    default: 'pending'
+  },
+  transaction_code: {
+    type: String,
+    default: ''
+  },
+  payment_method: {
+    type: String,
+    default: 'manual_mpesa'
+  },
   description: {
     type: String,
     default: ''

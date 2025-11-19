@@ -3,6 +3,7 @@ import { ArrowLeft, Play, Clock, Users, Star, BookOpen, Award, MessageCircle, Ch
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { apiFetch } from '../utils/apiFetch';
+import ManualPaymentModal from './ManualPaymentModal';
 
 interface CourseDetailProps {
   courseId: string | null;
@@ -47,6 +48,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
   const [enrolled, setEnrolled] = useState(false);
   const [isLoadingCourse, setIsLoadingCourse] = useState(true);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   // Fetch course data on mount
   useEffect(() => {
@@ -109,7 +111,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
     fetchCourseData();
   }, [courseId, showToast]);
 
-  const handleEnroll = async () => {
+  const handleEnrollClick = () => {
     if (!user) {
       setCurrentView('login');
       showToast('Please log in to enroll in a course.', 'warning');
@@ -121,16 +123,29 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
       return;
     }
 
+    if (course.price > 0) {
+      setIsPaymentModalOpen(true);
+    } else {
+      handleEnrollSubmit();
+    }
+  };
+
+  const handleEnrollSubmit = async (transactionCode?: string) => {
+    if (!course) return;
+
     try {
       setEnrolled(true);
       // Call enrollment API
       await apiFetch('/enroll', {
         method: 'POST',
         body: JSON.stringify({
-          course_id: course._id
+          course_id: course._id,
+          transaction_code: transactionCode || '',
+          payment_method: transactionCode ? 'manual_mpesa' : 'free'
         })
       });
-      showToast('Enrolled in course successfully!', 'success');
+      showToast(transactionCode ? 'Payment submitted! Waiting for approval.' : 'Enrolled in course successfully!', 'success');
+      setIsPaymentModalOpen(false);
     } catch (err) {
       console.error(err);
       showToast('Error enrolling in course. Please try again.', 'error');
@@ -216,11 +231,11 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
                   </span>
                 </div>
               </div>
-              
+
               <div className="p-6">
                 <h1 className="text-3xl font-bold text-gray-900 mb-4">{course.title}</h1>
                 <p className="text-gray-600 mb-4">{course.description}</p>
-                
+
                 <div className="flex items-center space-x-6 text-sm text-gray-500 mb-4">
                   <div className="flex items-center space-x-1">
                     <Users className="w-4 h-4" />
@@ -268,11 +283,10 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                        activeTab === tab.id
+                      className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
                           ? 'border-blue-500 text-blue-600'
                           : 'border-transparent text-gray-500 hover:text-gray-700'
-                      }`}
+                        }`}
                     >
                       {tab.label}
                     </button>
@@ -470,10 +484,10 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
                 </div>
               ) : (
                 <button
-                  onClick={handleEnroll}
+                  onClick={handleEnrollClick}
                   className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium mb-4"
                 >
-                  {course.price === 0 ? 'Enroll for Free' : 'Enroll Now'}
+                  {course.price === 0 ? 'Enroll for Free' : 'Buy Now'}
                 </button>
               )}
 
@@ -525,6 +539,15 @@ const CourseDetail: React.FC<CourseDetailProps> = ({ courseId, setCurrentView })
           </div>
         </div>
       </div>
+
+      <ManualPaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        amount={course.price}
+        phoneNumber="0712345678"
+        onSubmit={handleEnrollSubmit}
+        title={`Purchase ${course.title}`}
+      />
     </div>
   );
 };

@@ -15,6 +15,19 @@ const EnrollmentSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  payment_status: {
+    type: String,
+    enum: ['pending', 'completed', 'failed'],
+    default: 'pending'
+  },
+  transaction_code: {
+    type: String,
+    default: ''
+  },
+  payment_method: {
+    type: String,
+    default: 'manual_mpesa'
+  },
   completion_date: {
     type: Date,
     default: null
@@ -41,8 +54,8 @@ const EnrollmentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['enrolled', 'in-progress', 'completed'],
-    default: 'enrolled'
+    enum: ['active', 'completed', 'dropped'],
+    default: 'active'
   },
   time_spent: {
     type: Number,

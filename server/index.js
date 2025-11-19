@@ -15,6 +15,7 @@ import fs from 'fs';
 import Notification from './models/Notification.js';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
+import adminRoutes from './routes/admin.js';
 import {
   loginLimiter,
   apiLimiter,
@@ -165,7 +166,7 @@ const authenticateToken = (req, res, next) => {
       req.user = user;
       return next();
     }
-    
+
     // If current secret fails, try old secret for backward compatibility
     jwt.verify(token, JWT_SECRET_OLD, (errOld, userOld) => {
       if (errOld) {
@@ -217,18 +218,18 @@ app.post('/api/users/avatar', authenticateToken, upload.single('avatar'), async 
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
-    
+
     const avatarUrl = `/uploads/avatars/${req.file.filename}`;
     const updatedUser = await User.findByIdAndUpdate(
       req.user.userId,
       { avatar: avatarUrl },
       { new: true }
     );
-    
+
     if (!updatedUser) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
+
     res.json({ avatar: avatarUrl, success: true });
   } catch (error) {
     console.error('Avatar upload error:', error);
@@ -252,6 +253,9 @@ app.use((err, req, res, next) => {
 
 // Routes
 
+// Admin routes
+app.use('/api/admin', authenticateToken, adminRoutes);
+
 // Auth routes
 app.post('/api/auth/register', signupLimiter, async (req, res) => {
   try {
@@ -264,8 +268,8 @@ app.post('/api/auth/register', signupLimiter, async (req, res) => {
 
     // Validate password strength
     if (!validatePassword(password)) {
-      return res.status(400).json({ 
-        error: 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character' 
+      return res.status(400).json({
+        error: 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character'
       });
     }
 
@@ -296,15 +300,15 @@ app.post('/api/auth/register', signupLimiter, async (req, res) => {
     // Generate token
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '24h' });
 
-    res.json({ 
-      token, 
-      user: { 
-        id: user._id, 
-        email: user.email, 
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
         name: user.name,
         avatar: user.avatar,
         role: user.role
-      } 
+      }
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -330,15 +334,15 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
     // Generate token
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '24h' });
 
-    res.json({ 
-      token, 
-      user: { 
-        id: user._id, 
-        email: user.email, 
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
         name: user.name,
         avatar: user.avatar,
         role: user.role
-      } 
+      }
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -352,7 +356,7 @@ app.get('/api/auth/verify', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'User not found' });
     }
 
-    res.json({ 
+    res.json({
       user: {
         id: user._id,
         email: user.email,
@@ -422,7 +426,7 @@ app.get('/api/projects/:id', async (req, res) => {
 app.put('/api/projects/:id', authenticateToken, async (req, res) => {
   try {
     const project = await Project.findById(req.params.id);
-    
+
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });
     }
@@ -446,7 +450,7 @@ app.put('/api/projects/:id', authenticateToken, async (req, res) => {
 app.delete('/api/projects/:id', authenticateToken, async (req, res) => {
   try {
     const project = await Project.findById(req.params.id);
-    
+
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });
     }
@@ -467,24 +471,26 @@ app.delete('/api/projects/:id', authenticateToken, async (req, res) => {
 // Contribution routes
 app.post('/api/contributions', authenticateToken, async (req, res) => {
   try {
-    const { project_id, amount, type, description } = req.body;
+    const { project_id, amount, type, description, transaction_code, payment_method } = req.body;
 
     const contribution = new Contribution({
       user_id: req.user.userId,
       project_id,
       amount,
       type,
-      description: description || ''
+      description: description || '',
+      transaction_code: transaction_code || '',
+      payment_method: payment_method || 'manual_mpesa'
     });
 
     await contribution.save();
 
-    // Update project current amount if monetary contribution
-    if (type === 'monetary') {
+    // Update project current amount if monetary contribution AND payment is completed
+    if (type === 'monetary' && contribution.payment_status === 'completed') {
       const project = await Project.findById(project_id);
       if (project) {
         const newAmount = (project.current_amount || 0) + amount;
-        const newProgress = project.target_amount > 0 
+        const newProgress = project.target_amount > 0
           ? Math.min(Math.round((newAmount / project.target_amount) * 100), 100)
           : project.progress;
 
@@ -535,10 +541,6 @@ app.get('/api/courses', async (req, res) => {
   try {
     const { category, subject, level, search, sortBy } = req.query;
     let query = {};
-
-    if (category && category !== 'all') query.category = category;
-    if (subject && subject !== 'all') query.subject = subject;
-    if (level && level !== 'all') query.level = level;
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
@@ -771,7 +773,7 @@ app.get('/api/user/projects', authenticateToken, async (req, res) => {
 app.put('/api/user/profile', authenticateToken, async (req, res) => {
   try {
     const { name, avatar } = req.body;
-    
+
     const user = await User.findByIdAndUpdate(
       req.user.userId,
       { name, avatar },
@@ -800,7 +802,7 @@ app.get('/api/stats', async (req, res) => {
     const completedProjects = await Project.countDocuments({ status: 'completed' });
     const totalUsers = await User.countDocuments();
     const totalContributions = await Contribution.countDocuments();
-    
+
     // Get total monetary contributions
     const monetaryContributions = await Contribution.aggregate([
       { $match: { type: 'monetary' } },

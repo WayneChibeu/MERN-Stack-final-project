@@ -19,6 +19,7 @@ import { SocketProvider } from './context/SocketContext';
 import Footer from './components/Footer';
 import NotificationSettings from './components/NotificationSettings';
 import Settings from './components/Settings';
+import AdminPaymentDashboard from './components/AdminPaymentDashboard';
 
 // Route protection wrappers
 const RequireAuth = ({ children }: { children: React.ReactNode }) => {
@@ -33,9 +34,18 @@ const RequireTeacher = ({ children }: { children: React.ReactNode }) => {
   return user && user.role === 'teacher' ? <>{children}</> : <Navigate to="/dashboard" replace />;
 };
 
+const RequireAdmin = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  return user && user.role === 'admin' ? <>{children}</> : <Navigate to="/dashboard" replace />;
+};
+
 const DashboardRedirect = () => {
   const { user } = useAuth();
   if (!user) return null;
+  if (user.role === 'admin') {
+    return <Navigate to="/admin/payments" replace />;
+  }
   if (user.role === 'teacher') {
     return <Navigate to="/teacher/dashboard" replace />;
   }
@@ -59,24 +69,36 @@ function App() {
                     <Route path="/" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/dashboard" element={<RequireAuth><DashboardRedirect /></RequireAuth>} />
                     <Route path="/dashboard/student" element={<RequireAuth><Dashboard /></RequireAuth>} />
-                    <Route path="/courses" element={<RequireAuth><CourseCatalog setCurrentView={() => {}} setSelectedCourse={() => {}} /></RequireAuth>} />
-                    <Route path="/course/:id" element={<RequireAuth><CourseDetail courseId="" setCurrentView={() => {}} /></RequireAuth>} />
-                    <Route path="/my-learning" element={<RequireAuth><MyLearning setCurrentView={() => {}} setSelectedCourse={() => {}} /></RequireAuth>} />
+
+                    {/* Admin routes */}
+                    <Route path="/admin/payments" element={<RequireAdmin><AdminPaymentDashboard /></RequireAdmin>} />
+
+                    {/* Course routes */}
+                    <Route path="/courses" element={<RequireAuth><CourseCatalog setCurrentView={() => { }} setSelectedCourse={() => { }} /></RequireAuth>} />
+                    <Route path="/course/:id" element={<RequireAuth><CourseDetail courseId="" setCurrentView={() => { }} /></RequireAuth>} />
+                    <Route path="/my-learning" element={<RequireAuth><MyLearning setCurrentView={() => { }} setSelectedCourse={() => { }} /></RequireAuth>} />
+
+                    {/* Project routes */}
                     <Route path="/projects" element={<RequireAuth><ProjectsList /></RequireAuth>} />
                     <Route path="/create-project" element={<RequireAuth><CreateProject /></RequireAuth>} />
-                    <Route path="/profile" element={<RequireAuth><Profile setCurrentView={() => {}} /></RequireAuth>} />
+
+                    {/* User routes */}
+                    <Route path="/profile" element={<RequireAuth><Profile setCurrentView={() => { }} /></RequireAuth>} />
                     <Route path="/settings/notifications" element={<RequireAuth><NotificationSettings /></RequireAuth>} />
                     <Route path="/settings" element={
                       <RequireAuth>
                         <Settings />
                       </RequireAuth>
                     } />
+
                     {/* Teacher-only routes */}
                     <Route path="/teacher/dashboard" element={<RequireTeacher><TeacherDashboard /></RequireTeacher>} />
                     <Route path="/teacher/create-course" element={<RequireTeacher><CreateCourse /></RequireTeacher>} />
+
                     {/* Auth routes */}
-                    <Route path="/login" element={<AuthForm type="login" setCurrentView={() => {}} />} />
-                    <Route path="/register" element={<AuthForm type="register" setCurrentView={() => {}} />} />
+                    <Route path="/login" element={<AuthForm type="login" setCurrentView={() => { }} />} />
+                    <Route path="/register" element={<AuthForm type="register" setCurrentView={() => { }} />} />
+
                     {/* Fallback */}
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                   </Routes>
